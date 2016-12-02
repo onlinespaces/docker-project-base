@@ -8,7 +8,6 @@ services:
                 CHAR_SET_SERVER: ${CHAR_SET_SERVER}
                 COLLATION_SERVER: ${COLLATION_SERVER}
                 DEFAULT_CHAR_SET: ${DEFAULT_CHAR_SET}
-        container_name: mysql
         ports:
             - "3306:3306"
         restart: always
@@ -22,12 +21,10 @@ services:
 
     redis:
         image: redis:alpine
-        container_name: redis
         ports:
             - "6379:6379"
 
     php-fpm:
-        container_name: php-fpm
         build:
             context: php-fpm
             args:
@@ -48,7 +45,6 @@ services:
             - redis
 
     nginx:
-        container_name: nginx
         build:
             context: nginx
             args:
@@ -68,7 +64,6 @@ services:
             - ./logs/nginx:/var/log/nginx
 
     phpmyadmin:
-        container_name: phpmyadmin
         image: phpmyadmin/phpmyadmin
         ports:
             - "8080:80"
@@ -76,7 +71,6 @@ services:
             - db
 
     elk:
-        container_name: elk
         image: willdurand/elk
         ports:
             - "81:80"
