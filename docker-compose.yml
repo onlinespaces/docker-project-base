@@ -1,0 +1,88 @@
+version: '2'
+
+services:
+    db:
+        build:
+            context: mysql
+            args:
+                CHAR_SET_SERVER: ${CHAR_SET_SERVER}
+                COLLATION_SERVER: ${COLLATION_SERVER}
+                DEFAULT_CHAR_SET: ${DEFAULT_CHAR_SET}
+        container_name: mysql
+        ports:
+            - "3306:3306"
+        restart: always
+        environment:
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+            MYSQL_DATABASE: ${MYSQL_DATABASE}
+            MYSQL_USER: ${MYSQL_USER}
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+        volumes:
+            - ./data/mysql/data:/var/lib/mysql
+
+    redis:
+        image: redis:alpine
+        container_name: redis
+        ports:
+            - "6379:6379"
+
+    php-fpm:
+        container_name: php-fpm
+        build:
+            context: php-fpm
+            args:
+                PROJECT_NAME: ${PROJECT_NAME}
+                XDEBUG_IDE_KEY: ${XDEBUG_IDE_KEY}
+                XDEBUG_REMOTE_PORT: ${XDEBUG_REMOTE_PORT}
+                TIME_ZONE: ${TIME_ZONE}
+                PHP_FPM_PORT: ${PHP_FPM_PORT}
+        ports:
+            - "${PHP_FPM_PORT}:${PHP_FPM_PORT}"
+            - "${XDEBUG_REMOTE_PORT}:${XDEBUG_REMOTE_PORT}"
+            - "${SSH_PUBLIC_PORT}:22"
+        volumes:
+            - ./${PROJECT_NAME}:/var/www/${PROJECT_NAME}
+            - ./logs/${PROJECT_NAME}:/var/www/${PROJECT_NAME}/var/logs
+        links:
+            - db:mysqldb
+            - redis
+
+    nginx:
+        container_name: nginx
+        build:
+            context: nginx
+            args:
+                DOMAIN_NAME: ${DOMAIN_NAME}
+                PROJECT_NAME: ${PROJECT_NAME}
+                PHP_FPM_PORT: ${PHP_FPM_PORT}
+                WEBSITE_DIR: ${WEBSITE_DIR}
+        restart: always
+        ports:
+            - "80:80"
+            - "443:443"
+        links:
+            - php-fpm
+        volumes_from:
+            - php-fpm
+        volumes:
+            - ./logs/nginx:/var/log/nginx
+
+    phpmyadmin:
+        container_name: phpmyadmin
+        image: phpmyadmin/phpmyadmin
+        ports:
+            - "8080:80"
+        links:
+            - db
+
+    elk:
+        container_name: elk
+        image: willdurand/elk
+        ports:
+            - "81:80"
+        volumes:
+            - ./elk/logstash:/etc/logstash
+            - ./elk/logstash/patterns:/opt/logstash/patterns
+        volumes_from:
+            - php-fpm
+            - nginx
