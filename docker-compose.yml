@@ -3,7 +3,7 @@ version: '2'
 services:
     db:
         build:
-            context: mysql
+            context: ./docker/mysql
             args:
                 CHAR_SET_SERVER: ${CHAR_SET_SERVER}
                 COLLATION_SERVER: ${COLLATION_SERVER}
@@ -26,7 +26,7 @@ services:
 
     php-fpm:
         build:
-            context: php-fpm
+            context: ./docker/php-fpm
             args:
                 PROJECT_NAME: ${PROJECT_NAME}
                 XDEBUG_IDE_KEY: ${XDEBUG_IDE_KEY}
@@ -46,7 +46,7 @@ services:
 
     nginx:
         build:
-            context: nginx
+            context: ./docker/nginx
             args:
                 DOMAIN_NAME: ${DOMAIN_NAME}
                 PROJECT_NAME: ${PROJECT_NAME}
@@ -75,8 +75,8 @@ services:
         ports:
             - "81:80"
         volumes:
-            - ./elk/logstash:/etc/logstash
-            - ./elk/logstash/patterns:/opt/logstash/patterns
+            - ./docker/elk/logstash:/etc/logstash
+            - ./docker/elk/logstash/patterns:/opt/logstash/patterns
         volumes_from:
             - php-fpm
             - nginx
