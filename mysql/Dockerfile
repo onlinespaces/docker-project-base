@@ -6,7 +6,7 @@ ARG COLLATION_SERVER
 ARG DEFAULT_CHAR_SET
 
 RUN { \
-      echo "innodb_data_file_path = ibdata1:10M:autoextend" \
+      echo "innodb_data_file_path = ibdata1:10M:autoextend"; \
       echo "[mysqld]"; \
       echo "character-set-server=${CHAR_SET_SERVER}"; \
       echo "collation-server=${COLLATION_SERVER}"; \
