@@ -24,15 +24,15 @@ RUN rm -f /etc/nginx/sites-available/*
 RUN rm -f /etc/nginx/conf.d/*
 
 COPY nginx.conf /etc/nginx/
-COPY project.conf /etc/nginx/sites-enabled/project.conf
+COPY website.conf /etc/nginx/sites-enabled/${PROJECT_NAME}.conf
 
-RUN sed -i "s/#DOMAIN_NAME#/${DOMAIN_NAME}/g" /etc/nginx/sites-enabled/project.conf
-RUN sed -i "s/#PROJECT_NAME#/${PROJECT_NAME}/g" /etc/nginx/sites-enabled/project.conf
-RUN sed -i "s/#PHP_FPM_PORT#/${PHP_FPM_PORT}/g" /etc/nginx/sites-enabled/project.conf
-RUN sed -i "s/#WEBSITE_DIR#/${WEBSITE_DIR}/g" /etc/nginx/sites-enabled/project.conf
+RUN sed -i "s/#DOMAIN_NAME#/${DOMAIN_NAME}/g" /etc/nginx/sites-enabled/${PROJECT_NAME}.conf
+RUN sed -i "s/#PROJECT_NAME#/${PROJECT_NAME}/g" /etc/nginx/sites-enabled/${PROJECT_NAME}.conf
+RUN sed -i "s/#PHP_FPM_PORT#/${PHP_FPM_PORT}/g" /etc/nginx/sites-enabled/${PROJECT_NAME}.conf
+RUN sed -i "s/#WEBSITE_DIR#/${WEBSITE_DIR}/g" /etc/nginx/sites-enabled/${PROJECT_NAME}.conf
 
 RUN mkdir /etc/nginx/sites-available
-RUN ln -sf /etc/nginx/sites-enabled/project.conf/etc/nginx/sites-available/project.conf
+RUN ln -sf /etc/nginx/sites-enabled/${PROJECT_NAME}.conf /etc/nginx/sites-available/${PROJECT_NAME}.conf
 RUN echo "upstream php-upstream { server php-fpm:${PHP_FPM_PORT}; }" > /etc/nginx/conf.d/upstream.conf
 
 RUN usermod -u 1000 www-data
