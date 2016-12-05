@@ -2,7 +2,8 @@ version: '2'
 
 services:
     db:
-        image: mysql:5.7
+        build:
+            context: ./docker/mysql
         ports:
             - "3306:3306"
         restart: always
@@ -11,9 +12,11 @@ services:
             MYSQL_DATABASE: ${MYSQL_DATABASE}
             MYSQL_USER: ${MYSQL_USER}
             MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+            CHAR_SET_SERVER: ${CHAR_SET_SERVER}
+            COLLATION_SERVER: ${COLLATION_SERVER}
+            DEFAULT_CHAR_SET: ${DEFAULT_CHAR_SET}
         volumes:
             - ./data/mysql/data:/var/lib/mysql
-            - ./docker/mysql/entry-point:/docker-entrypoint-initdb.d
 
     redis:
         image: redis:alpine
@@ -64,7 +67,7 @@ services:
         ports:
             - "8080:80"
         links:
-            - db
+            - db:mysqldb
 
     elk:
         image: willdurand/elk

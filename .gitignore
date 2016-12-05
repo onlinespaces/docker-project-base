@@ -1,5 +1,6 @@
 /.idea
 /data
+/data/**
 /logs
 .env
 /project
