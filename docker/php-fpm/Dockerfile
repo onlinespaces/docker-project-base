@@ -146,7 +146,11 @@ EXPOSE 22 ${PHP_FPM_PORT} ${XDEBUG_REMOTE_PORT}
 
 WORKDIR /var/www/${PROJECT_NAME}
 
+RUN git config --global user.email "${USER_EMAIL}"
+RUN git config --global user.name "${USER_NAME}"
+
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+RUN sed -i "s/#PHP_FPM_PORT#/${PHP_FPM_PORT}/g" /etc/supervisor/conf.d/supervisord.conf
 CMD ["/usr/bin/supervisord"]
 
 
