@@ -53,19 +53,20 @@ RUN { \
 RUN sed -Ei 's/^(bind-address|log)/#&/' /etc/mysql/mysql.conf.d/mysqld.cnf \
 	&& echo '[mysqld]\nskip-host-cache\nskip-name-resolve' > /etc/mysql/conf.d/docker.cnf
 
-RUN { \
-      echo "[mysqld]"; \
-      echo "character-set-server=${CHAR_SET_SERVER}"; \
-      echo "collation-server=${COLLATION_SERVER}"; \
-      echo "[client]"; \
-      echo "default-character-set=${DEFAULT_CHAR_SET}"; \
-} >> /etc/mysql/conf.d/mysql.cnf
-
 VOLUME /var/lib/mysql
 
 COPY docker-entrypoint.sh /usr/local/bin/
-RUN ln -s usr/local/bin/docker-entrypoint.sh /entrypoint.sh # backwards compat
+RUN ln -s /usr/local/bin/docker-entrypoint.sh /entrypoint.sh # backwards compat
+RUN chmod 777 /usr/local/bin/docker-entrypoint.sh
 ENTRYPOINT ["docker-entrypoint.sh"]
+
+#RUN { \
+#      echo "[mysqld]"; \
+#      echo "character-set-server=${CHAR_SET_SERVER}"; \
+#      echo "collation-server=${COLLATION_SERVER}"; \
+#      echo "[client]"; \
+#      echo "default-character-set=${DEFAULT_CHAR_SET}"; \
+#} >> /etc/mysql/conf.d/mysql.cnf
 
 EXPOSE 3306
 CMD ["mysqld"]
