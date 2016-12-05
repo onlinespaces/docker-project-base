@@ -9,6 +9,7 @@ To have a development environment so that only git and docker are required to be
 ##Description
 ###MySQL
 - MySQL 5.7
+
 ###PHP-FPM
 - PHP7.0
 - SSH
@@ -25,26 +26,31 @@ To have a development environment so that only git and docker are required to be
 - Git
 
 **Note:** SSH is installed due to the fact that Docker for Windows does not support interactive commands. There are work around for this. But, I prefer to just SSH into the container.  It you are developing on a Mac, then, you do not need to install openssh and can comment out or remove those lines.
+
 ###NGINX
 
 ###REDIS
 The official Redis Docker image.
 
 Source:  https://hub.docker.com/_/redis/
+
 ###ELK
 An ELK stack Docker image.
 
 Source:  https://hub.docker.com/r/willdurand/elk/
+
 ###phpMyAdmin
 The official phpMyAdmin Docker image.
 
 Source:  https://hub.docker.com/r/phpmyadmin/phpmyadmin/
+
 ##Instructions
 1. Clone the project into a directory
 ```
     git clone https://github.com/onlinespaces/docker-project-base.git
 ```
 2. Rename .env.dev to .env and change any settings needed.
+
 ###Settings
 ```
 # The type of application. Currently, this is not used.
