@@ -3,6 +3,10 @@ FROM debian:jessie
 # add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
 RUN groupadd -r mysql && useradd -r -g mysql mysql
 
+ARG CHAR_SET_SERVER
+ARG COLLATION_SERVER
+ARG DEFAULT_CHAR_SET
+
 # add gosu for easy step-down from root
 ENV GOSU_VERSION 1.7
 RUN set -x \
@@ -55,18 +59,18 @@ RUN sed -Ei 's/^(bind-address|log)/#&/' /etc/mysql/mysql.conf.d/mysqld.cnf \
 
 VOLUME /var/lib/mysql
 
+RUN { \
+      echo "character-set-server=${CHAR_SET_SERVER}"; \
+      echo "collation-server=${COLLATION_SERVER}"; \
+      echo "[client]"; \
+      echo "default-character-set=${DEFAULT_CHAR_SET}"; \
+} >> /etc/mysql/mysql.conf.d/mysqld.cnf
+
+
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN ln -s /usr/local/bin/docker-entrypoint.sh /entrypoint.sh # backwards compat
 RUN chmod 777 /usr/local/bin/docker-entrypoint.sh
 ENTRYPOINT ["docker-entrypoint.sh"]
-
-#RUN { \
-#      echo "[mysqld]"; \
-#      echo "character-set-server=${CHAR_SET_SERVER}"; \
-#      echo "collation-server=${COLLATION_SERVER}"; \
-#      echo "[client]"; \
-#      echo "default-character-set=${DEFAULT_CHAR_SET}"; \
-#} >> /etc/mysql/conf.d/mysql.cnf
 
 EXPOSE 3306
 CMD ["mysqld"]
