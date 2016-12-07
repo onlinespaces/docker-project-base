@@ -60,11 +60,12 @@ RUN sed -Ei 's/^(bind-address|log)/#&/' /etc/mysql/mysql.conf.d/mysqld.cnf \
 VOLUME /var/lib/mysql
 
 RUN { \
+      echo "[mysqld]"; \
       echo "character-set-server=${CHAR_SET_SERVER}"; \
       echo "collation-server=${COLLATION_SERVER}"; \
       echo "[client]"; \
       echo "default-character-set=${DEFAULT_CHAR_SET}"; \
-} >> /etc/mysql/mysql.conf.d/mysqld.cnf
+} >> /etc/mysql/mysql.conf.d/zz-mysqld.cnf
 
 
 COPY docker-entrypoint.sh /usr/local/bin/
