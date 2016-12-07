@@ -24,7 +24,7 @@ RUN rm -f /etc/nginx/sites-available/*
 RUN rm -f /etc/nginx/conf.d/*
 
 COPY nginx.conf /etc/nginx/
-COPY conf.d/* /etc/nginx/sites-enabled/
+COPY conf.d/${PROJECT_NAME}.conf /etc/nginx/sites-enabled/
 
 RUN sed -i "s/#DOMAIN_NAME#/${DOMAIN_NAME}/g" /etc/nginx/sites-enabled/${PROJECT_NAME}.conf
 RUN sed -i "s/#PROJECT_NAME#/${PROJECT_NAME}/g" /etc/nginx/sites-enabled/${PROJECT_NAME}.conf
