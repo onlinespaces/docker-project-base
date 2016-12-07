@@ -39,9 +39,7 @@ services:
             - "${SSH_PUBLIC_PORT}:22"
         volumes:
             - ./${PROJECT_NAME}:/var/www/${PROJECT_NAME}
-            - ./project2:/var/www/project2
             - ./logs/${PROJECT_NAME}:/var/www/${PROJECT_NAME}/var/logs
-            - ./logs/project2:/var/www/project2/var/logs
         links:
             - db:mysqldb
             - redis
@@ -74,26 +72,6 @@ services:
         environment:
             - VIRTUAL_HOST=${DOMAIN_NAME}
 
-    nginx_prod:
-        build:
-            context: ./docker/nginx
-            args:
-                DOMAIN_NAME: 'project.dev'
-                PROJECT_NAME: 'project2'
-                PHP_FPM_PORT: ${PHP_FPM_PORT}
-                WEBSITE_DIR: ${WEBSITE_DIR}
-        restart: always
-        expose:
-            - "80"
-        links:
-            - php-fpm
-        volumes_from:
-            - php-fpm
-        volumes:
-            - ./logs/nginx_prod:/var/log/nginx
-        environment:
-            - VIRTUAL_HOST=project.dev
-
     phpmyadmin:
         image: phpmyadmin/phpmyadmin
         expose:
@@ -101,7 +79,7 @@ services:
         links:
             - db:mysqldb
         environment:
-            - VIRTUAL_HOST=phpmyadmin.dev
+            - VIRTUAL_HOST=${PHPMYADMIN_DOMAIN_NAME}
 
     elk:
         image: willdurand/elk
@@ -114,4 +92,4 @@ services:
             - php-fpm
             - nginx
         environment:
-            - VIRTUAL_HOST=elk.dev
+            - VIRTUAL_HOST=${ELK_DOMAIN_NAME}
