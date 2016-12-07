@@ -44,6 +44,14 @@ services:
             - db:mysqldb
             - redis
 
+    nginx-proxy:
+        image: jwilder/nginx-proxy
+        ports:
+            - "${HTTP_PORT}:80"
+            - "${HTTPS_PORT}:443"
+        volumes:
+            - /var/run/docker.sock:/tmp/docker.sock:ro
+
     nginx:
         build:
             context: ./docker/nginx
@@ -53,30 +61,35 @@ services:
                 PHP_FPM_PORT: ${PHP_FPM_PORT}
                 WEBSITE_DIR: ${WEBSITE_DIR}
         restart: always
-        ports:
-            - "${HTTP_PORT}:80"
-            - "${HTTPS_PORT}:443"
+        expose:
+            - "80"
         links:
             - php-fpm
         volumes_from:
             - php-fpm
         volumes:
             - ./logs/nginx:/var/log/nginx
+        environment:
+            - VIRTUAL_HOST=${DOMAIN_NAME}
 
     phpmyadmin:
         image: phpmyadmin/phpmyadmin
-        ports:
-            - "8080:80"
+        expose:
+            - "80"
         links:
             - db:mysqldb
+        environment:
+            - VIRTUAL_HOST=phpmyadmin.dev
 
     elk:
         image: willdurand/elk
-        ports:
-            - "81:80"
+        expose:
+            - "80"
         volumes:
             - ./docker/elk/logstash:/etc/logstash
             - ./docker/elk/logstash/patterns:/opt/logstash/patterns
         volumes_from:
             - php-fpm
             - nginx
+        environment:
+            - VIRTUAL_HOST=elk.dev
