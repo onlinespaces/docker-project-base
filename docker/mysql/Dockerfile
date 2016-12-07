@@ -67,7 +67,6 @@ RUN { \
       echo "default-character-set=${DEFAULT_CHAR_SET}"; \
 } >> /etc/mysql/mysql.conf.d/zz-mysqld.cnf
 
-
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN ln -s /usr/local/bin/docker-entrypoint.sh /entrypoint.sh # backwards compat
 RUN chmod 777 /usr/local/bin/docker-entrypoint.sh
