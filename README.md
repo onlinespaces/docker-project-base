@@ -55,37 +55,43 @@ Source:  https://hub.docker.com/r/phpmyadmin/phpmyadmin/
 ```
 # The type of application. Currently, this is not used.
 APPLICATION_TYPE=symfony
- 
+
 # Project Information
 # This will be the directory that the code is stored in.
+# If you change this value, you also need to change the location in the logstash.conf file
 PROJECT_NAME=project
-DOMAIN_NAME=symfony.dev
- 
+
+# Domains
+DOMAIN_NAME=project.local
+PHPMYADMIN_DOMAIN_NAME=phpmyadmin.local
+ELK_DOMAIN_NAME=elk.local
+
 # The name of the directory where web files are stored.
 # Symfony usually is 'web' and Drupal is 'public'
 WEBSITE_DIR=web
- 
+HTTP_PORT=80
+HTTPS_PORT=443
+
 # MYSQL Settings
 MYSQL_ROOT_PASSWORD=root
 MYSQL_DATABASE=symfony
 MYSQL_USER=docker
 MYSQL_PASSWORD=docker
-CHAR_SET_SERVER=utf8mb4
-COLLATION_SERVER=utf8mb4_unicode_ci
-DEFAULT_CHAR_SET=utf8mb4
- 
+MYSQL_PORT=3306
+
 # XDEBUG Settings
 XDEBUG_IDE_KEY=PHPSTORM
 XDEBUG_REMOTE_PORT=9000
- 
+
 # PHP-FPM. This should be different from xdebug
 PHP_FPM_PORT=9001
 
+# Timezone
 TIME_ZONE=/usr/share/zoneinfo/US/Central
- 
+
 # SSH Port
 SSH_PUBLIC_PORT=2222
- 
+
 # Git Info
 USER_EMAIL=your.email@email.com
 USER_NAME=Your Name
