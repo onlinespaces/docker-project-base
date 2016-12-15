@@ -73,7 +73,6 @@ DOMAIN_NAME=project.local
 PHPMYADMIN_DOMAIN_NAME=phpmyadmin.local
 ELK_DOMAIN_NAME=elk.local
 
-
 # The name of the directory where web files are stored.
 # Symfony usually is 'web' and Drupal is 'public'
 WEBSITE_DIR=web
