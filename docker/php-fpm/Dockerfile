@@ -77,7 +77,6 @@ RUN "date"
 # Change php fpm port
 RUN sed -i "s/listen = 127.0.0.1:9000/listen = 127.0.0.1:${PHP_FPM_PORT}/g" /usr/local/etc/php-fpm.d/www.conf
 RUN sed -i "s/listen = 127.0.0.1:9000/listen = 127.0.0.1:${PHP_FPM_PORT}/g" /usr/local/etc/php-fpm.d/www.conf.default
-# RUN sed -i "s/listen = [::]:9000/listen = [::]:${PHP_FPM_PORT}/g" /usr/local/etc/php-fpm.d/zz-docker.conf
 
 COPY .bashrc /root/
 
@@ -91,8 +90,6 @@ RUN apt-get install -y nodejs
 
 # NVM
 RUN curl https://raw.githubusercontent.com/creationix/nvm/v0.31.0/install.sh | sh -e
-
-#RUN bash -l -c "nvm install 6 && nvm alias default 6"
 
 # Disable progress bars by default: https://github.com/npm/npm/issues/11283
 RUN bash -l -c "npm set progress=false"
@@ -124,13 +121,9 @@ RUN curl -LsS https://symfony.com/installer -o /usr/local/bin/symfony
 RUN chmod a+x /usr/local/bin/symfony
 
 # SSH - Because docker does not work interactively on windows
-# RUN apt-get update && apt-get install -y openssh-server
 RUN mkdir /var/run/sshd
 RUN echo 'root:password' | chpasswd
 RUN sed -i 's/PermitRootLogin without-password/PermitRootLogin yes/' /etc/ssh/sshd_config
-
-# RUN mkdir /dev/stderr
-# RUN mkdir /dev/stdout
 
 # SSH login fix. Otherwise user is kicked off after login
 RUN sed -i 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' /etc/pam.d/sshd
@@ -146,8 +139,8 @@ EXPOSE 22 ${PHP_FPM_PORT} ${XDEBUG_REMOTE_PORT}
 
 WORKDIR /var/www/${PROJECT_NAME}
 
-RUN git config --global user.email "${USER_EMAIL}"
-RUN git config --global user.name "${USER_NAME}"
+RUN git config --global --system user.email "${USER_EMAIL}"
+RUN git config --global --system user.name "${USER_NAME}"
 
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 RUN sed -i "s/#PHP_FPM_PORT#/${PHP_FPM_PORT}/g" /etc/supervisor/conf.d/supervisord.conf
