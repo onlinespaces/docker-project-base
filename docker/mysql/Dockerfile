@@ -1,6 +1,10 @@
 FROM mysql:5.7
 MAINTAINER Scott Collier <scott@onlinespaces.com>
 
+ARG CHAR_SET_SERVER
+ARG COLLATION_SERVER
+ARG DEFAULT_CHAR_SET
+
 RUN { \
       echo "[mysqld]"; \
       echo "character-set-server=${CHAR_SET_SERVER}"; \
