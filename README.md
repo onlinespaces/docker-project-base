@@ -16,7 +16,7 @@ To have a development environment so that only git and docker are required to be
 - SSH
 - MemCache
 - xDebug
-- Superisord
+- Supervisord
 - OpCache
 - Nodejs
 - Composer
