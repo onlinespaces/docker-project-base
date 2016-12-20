@@ -100,9 +100,22 @@ RUN bash -l -c "npm set progress=false"
 # Install Compass
 # RUN gem update --system && gem install compass
 
-# Install Composer
+# Install Composergit c
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 RUN composer --version
+
+# Install PHPUnit
+curl -sSL https://phar.phpunit.de/phpunit.phar -o phpunit.phar && \
+    chmod +x phpunit.phar && \
+    mv phpunit.phar /usr/local/bin/phpunit && \
+
+# Install drush
+php -r "readfile('https://s3.amazonaws.com/files.drush.org/drush.phar');" > /usr/local/bin/drush && \
+chmod +x /usr/local/bin/drush && \
+
+# Install Drupal Console
+curl https://drupalconsole.com/installer -o /usr/local/bin/drupal && \
+chmod +x /usr/local/bin/drupal && \
 
 # Install Yarn
 RUN npm install -g yarn
