@@ -1,7 +1,7 @@
 version: '2'
 
 services:
-    db:
+    mysqldb:
         build:
             context: ./docker/mysql
             args:
@@ -42,7 +42,7 @@ services:
             - ./${PROJECT_NAME}:/var/www/${PROJECT_NAME}
             - ./logs/${PROJECT_NAME}:/var/www/${PROJECT_NAME}/var/logs
         links:
-            - db:mysqldb
+            - mysqldb
             - redis
 
     nginx-proxy:
@@ -78,7 +78,7 @@ services:
         expose:
             - "80"
         links:
-            - db:mysqldb
+            - mysqldb
         environment:
             - VIRTUAL_HOST=${PHPMYADMIN_DOMAIN_NAME}
 
