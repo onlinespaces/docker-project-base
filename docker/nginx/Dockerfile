@@ -1,4 +1,4 @@
-FROM nginx:1.10.2
+FROM nginx:1.11
 MAINTAINER Scott Collier <scott@onlinespaces.com>
 
 ARG DOMAIN_NAME
