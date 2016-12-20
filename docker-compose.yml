@@ -33,6 +33,7 @@ services:
                 XDEBUG_REMOTE_PORT: ${XDEBUG_REMOTE_PORT}
                 TIME_ZONE: ${TIME_ZONE}
                 PHP_FPM_PORT: ${PHP_FPM_PORT}
+        restart: always
         ports:
             - "${PHP_FPM_PORT}:${PHP_FPM_PORT}"
             - "${XDEBUG_REMOTE_PORT}:${XDEBUG_REMOTE_PORT}"
