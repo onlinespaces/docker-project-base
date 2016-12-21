@@ -83,7 +83,7 @@ RUN curl -Ss https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
     apt-get install -y nodejs && \
 
     # NVM
-    curl https://raw.githubusercontent.com/creationix/nvm/v0.31.0/install.sh | sh -e && \
+    curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.32.1/install.sh | bash && \
 
     # Disable progress bars by default: https://github.com/npm/npm/issues/11283
     bash -l -c "npm set progress=false" && \

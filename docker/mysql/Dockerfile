@@ -4,11 +4,12 @@ MAINTAINER Scott Collier <scott@onlinespaces.com>
 ARG CHAR_SET_SERVER
 ARG COLLATION_SERVER
 ARG DEFAULT_CHAR_SET
+ARG MYSQL_PORT
 
-RUN { \
-      echo "[mysqld]"; \
-      echo "character-set-server=${CHAR_SET_SERVER}"; \
-      echo "collation-server=${COLLATION_SERVER}"; \
-      echo "[client]"; \
-      echo "default-character-set=${DEFAULT_CHAR_SET}"; \
-} >> /etc/mysql/mysql.conf.d/zz-mysqld.cnf
+COPY zz-mysqld.cnf /etc/mysql/mysql.conf.d
+
+RUN sed -i "s/#CHAR_SET_SERVER#/${CHAR_SET_SERVER}/g" /etc/mysql/mysql.conf.d/zz-mysqld.cnf && \
+    sed -i "s/#COLLATION_SERVER#/${COLLATION_SERVER}/g" /etc/mysql/mysql.conf.d/zz-mysqld.cnf && \
+    sed -i "s/#DEFAULT_CHAR_SET#/${DEFAULT_CHAR_SET}/g" /etc/mysql/mysql.conf.d/zz-mysqld.cnf
+
+EXPOSE ${MYSQL_PORT}
