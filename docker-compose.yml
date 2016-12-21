@@ -20,7 +20,7 @@ services:
             - ./data/mysql:/var/lib/mysql
 
     redis:
-        image: redis:alpine
+        image: redis:3.2-alpine
         ports:
             - "6379:6379"
 
@@ -77,10 +77,15 @@ services:
         image: phpmyadmin/phpmyadmin
         expose:
             - "80"
-        links:
-            - mysqldb
+#        links:
+#            - mysqldb
         environment:
-            - VIRTUAL_HOST=${PHPMYADMIN_DOMAIN_NAME}
+            PMA_HOST: mysqldb
+            PMA_USER: root
+            PMA_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+            PHP_UPLOAD_MAX_FILESIZE: 1G
+            PHP_MAX_INPUT_VARS: 1G
+            VIRTUAL_HOST: ${PHPMYADMIN_DOMAIN_NAME}
 
     elk:
         image: willdurand/elk
