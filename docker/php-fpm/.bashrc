@@ -117,6 +117,9 @@ fi
 
 export PATH="$PATH:'yarn global bin'"
 
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+
 # If you do not want git information in the prompt, delete or comment out these lines
 # For more configuration info see https://github.com/magicmonty/bash-git-prompt
 GIT_PROMPT_FETCH_REMOTE_STATUS=0

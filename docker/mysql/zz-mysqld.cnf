@@ -1,0 +1,6 @@
+[mysqld]
+character-set-server=#CHAR_SET_SERVER#
+collation-server=#COLLATION_SERVER#
+
+[client]
+default-character-set=#DEFAULT_CHAR_SET#
