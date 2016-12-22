@@ -1,50 +1,48 @@
 FROM nginx:1.11
 MAINTAINER Scott Collier <scott@onlinespaces.com>
 
-ARG DOMAIN_NAME
+ARG APPLICATION_TYPE
 ARG PROJECT_NAME
-ARG PHP_FPM_PORT
 ARG WEBSITE_DIR
 
-RUN apt-get update && apt-get install -y \
+ENV APPLICATION_TYPE=${APPLICATION_TYPE}
+ENV PROJECT_NAME=${PROJECT_NAME}
+ENV WEBSITE_DIR=${WEBSITE_DIR}
+
+ENV TERM xterm
+
+RUN export TERM=xterm && \
+    apt-get update && apt-get install -y \
         nano \
-        net-tools
+        net-tools \
+        && \
 
-# Clean
-RUN apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+    # Clean
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
 
-# forward request and error logs to docker log collector
-RUN ln -sf /dev/stdout /var/log/nginx/access.log \
-    	&& ln -sf /dev/stderr /var/log/nginx/error.log
+    # forward request and error logs to docker log collector
+    ln -sf /dev/stdout /var/log/nginx/access.log && \
+    ln -sf /dev/stderr /var/log/nginx/error.log && \
 
-# Clear old nginx sites
-RUN rm -f /etc/nginx/sites-enabled/*
-RUN rm -f /etc/nginx/sites-available/*
-RUN rm -f /etc/nginx/conf.d/*
+    # Clear old nginx sites
+    rm -f /etc/nginx/sites-enabled/* && \
+    rm -f /etc/nginx/sites-available/* && \
+    rm -f /etc/nginx/conf.d/* && \
+
+    # Clean up
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/apk/* && \
+    mkdir /opt/docker-files
 
 COPY nginx.conf /etc/nginx/
-COPY conf.d/* /etc/nginx/sites-enabled/
+COPY conf.d/* /etc/opt/docker-files/
 
-RUN sed -i "s/#DOMAIN_NAME#/${DOMAIN_NAME}/g" /etc/nginx/sites-enabled/${PROJECT_NAME}.conf
-RUN sed -i "s/#PROJECT_NAME#/${PROJECT_NAME}/g" /etc/nginx/sites-enabled/${PROJECT_NAME}.conf
-RUN sed -i "s/#PHP_FPM_PORT#/${PHP_FPM_PORT}/g" /etc/nginx/sites-enabled/${PROJECT_NAME}.conf
-RUN sed -i "s/#WEBSITE_DIR#/${WEBSITE_DIR}/g" /etc/nginx/sites-enabled/${PROJECT_NAME}.conf
-
-RUN mkdir /etc/nginx/sites-available
-RUN ln -sf /etc/nginx/sites-enabled/${PROJECT_NAME}.conf /etc/nginx/sites-available/${PROJECT_NAME}.conf
-
-# Set PHP-FPM Port Forwarding
-RUN echo "upstream php-upstream { server php-fpm:${PHP_FPM_PORT}; }" > /etc/nginx/conf.d/upstream.conf
-
-RUN usermod -u 1000 www-data
+WORKDIR /var/www/${PROJECT_NAME}
 
 EXPOSE 80 443
 
-# RUN cat /etc/nginx/sites-enabled/${PROJECT_NAME}.conf
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-# Clean up
-RUN apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/apk/*
-
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["/usr/local/bin/docker-entrypoint.sh"]

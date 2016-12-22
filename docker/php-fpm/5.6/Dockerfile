@@ -1,4 +1,4 @@
-FROM php:7.0-fpm
+FROM php:5.6-fpm
 MAINTAINER Scott Collier <scott@onlinespaces.com>
 
 ARG PROJECT_NAME
@@ -9,16 +9,10 @@ ARG PHP_FPM_PORT
 
 ENV TERM xterm
 
-# set recommended PHP.ini settings
-# see https://secure.php.net/manual/en/opcache.installation.php
-COPY 00-opcache.ini /usr/local/etc/php/conf.d/
-COPY 00-xdebug.ini /usr/local/etc/php/conf.d/
-
 COPY .bashrc /root/
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY supervisord.conf /etc/supervisor/conf.d/
 
 RUN export TERM=xterm && \
-
     apt-get clean && apt-get update && apt-get install -y \
     apt-utils \
     apt-transport-https \
@@ -69,18 +63,12 @@ RUN curl -Ss https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
 
     mkdir -p /var/log/supervisor && \
 
-    # Change php fpm port
-    sed -i "s/listen = 127.0.0.1:9000/listen = 127.0.0.1:${PHP_FPM_PORT}/g" /usr/local/etc/php-fpm.d/www.conf && \
-    sed -i "s/listen = 127.0.0.1:9000/listen = 127.0.0.1:${PHP_FPM_PORT}/g" /usr/local/etc/php-fpm.d/www.conf.default && \
-    sed -i "s/#XDEBUG_IDE_KEY#/${XDEBUG_IDE_KEY}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
-    sed -i "s/#XDEBUG_REMOTE_PORT#/${XDEBUG_REMOTE_PORT}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
-
     # Show git information in the prompt. For more info see https://github.com/magicmonty/bash-git-prompt
     git clone https://github.com/magicmonty/bash-git-prompt.git /root/.bash-git-prompt --depth=1 && \
 
     # Node
     curl -sL https://deb.nodesource.com/setup_6.x | bash - && \
-    apt-get install -y nodejs && \
+    apt-get update && apt-get install -y nodejs && \
 
     # NVM
     curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.32.1/install.sh | bash && \
@@ -130,25 +118,54 @@ RUN curl -Ss https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
     sed -i 's/PermitRootLogin without-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
 
     # SSH login fix. Otherwise user is kicked off after login
-    sed -i 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' /etc/pam.d/sshd
+    sed -i 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' /etc/pam.d/sshd && \
 
+    touch /usr/local/etc/php/php.ini && \
+
+    # Configure php.ini
+    sed -i \
+        -e "s/^expose_php.*/expose_php = Off/" \
+        -e "s/^;date.timezone.*/date.timezone = UTC/" \
+        -e "s/^memory_limit.*/memory_limit = -1/" \
+        -e "s/^max_execution_time.*/max_execution_time = 300/" \
+        -e "s/^; max_input_vars.*/max_input_vars = 2000/" \
+        -e "s/^post_max_size.*/post_max_size = 512M/" \
+        -e "s/^upload_max_filesize.*/upload_max_filesize = 512M/" \
+        -e "s/^;always_populate_raw_post_data.*/always_populate_raw_post_data = -1/" \
+        -e "s/^error_reporting.*/error_reporting = E_ALL/" \
+        -e "s/^display_errors.*/display_errors = On/" \
+        -e "s/^display_startup_errors.*/display_startup_errors = On/" \
+        -e "s/^track_errors.*/track_errors = On/" \
+        -e "s/^mysqlnd.collect_memory_statistics.*/mysqlnd.collect_memory_statistics = On/" \
+        /usr/local/etc/php/php.ini && \
+
+    echo "error_log = \"/proc/self/fd/2\"" | tee -a /usr/local/etc/php/php.ini
+
+# set recommended PHP.ini settings
+# see https://secure.php.net/manual/en/opcache.installation.php
+COPY opcache.ini /usr/local/etc/php/conf.d/
+COPY xdebug.ini /usr/local/etc/php/conf.d/
 COPY default.aliases.drushrc.php /etc/drush/site-aliases/
 
 ENV NOTVISIBLE "in users profile"
-RUN echo "export VISIBLE=now" >> /etc/profile
 
-# Clean up
-RUN apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/apk/*
+RUN echo "export VISIBLE=now" >> /etc/profile && \
+    # Change php fpm port
+    # sed -i "s/listen = 127.0.0.1:9000/listen = 127.0.0.1:${PHP_FPM_PORT}/g" : /usr/local/etc/php-fpm.d/www.conf && \
+    # sed -i "s/listen = 127.0.0.1:9000/listen = 127.0.0.1:${PHP_FPM_PORT}/g" /usr/local/etc/php-fpm.d/www.conf.default && \
+    sed -i "s/#XDEBUG_IDE_KEY#/${XDEBUG_IDE_KEY}/g" /usr/local/etc/php/conf.d/xdebug.ini && \
+    sed -i "s/#XDEBUG_REMOTE_PORT#/${XDEBUG_REMOTE_PORT}/g" /usr/local/etc/php/conf.d/xdebug.ini && \
+
+    # Clean up
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/apk/* && \
+    git config --system user.email "${USER_EMAIL}" && \
+    git config --system user.name "${USER_NAME}" && \
+    sed -i "s/#PHP_FPM_PORT#/${PHP_FPM_PORT}/g" /etc/supervisor/conf.d/supervisord.conf
 
 EXPOSE 22 ${PHP_FPM_PORT} ${XDEBUG_REMOTE_PORT}
 
 WORKDIR /var/www/${PROJECT_NAME}
-
-RUN git config --system user.email "${USER_EMAIL}" && \
-    git config --system user.name "${USER_NAME}" && \
-
-    sed -i "s/#PHP_FPM_PORT#/${PHP_FPM_PORT}/g" /etc/supervisor/conf.d/supervisord.conf
 
 CMD ["/bin/bash", "-c", "source /root/.bashrc"]
 CMD ["/usr/bin/supervisord"]
