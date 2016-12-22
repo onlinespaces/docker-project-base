@@ -34,7 +34,7 @@ RUN export TERM=xterm && \
     mkdir /opt/docker-files
 
 COPY nginx.conf /etc/nginx/
-COPY conf.d/${APPLICATION_TYPE}.conf /etc/nginx/sites-enabled/${PROJECT_NAME}.conf
+COPY conf.d/* /etc/opt/docker-files/
 
 WORKDIR /var/www/${PROJECT_NAME}/${WEBSITE_DIR}
 
