@@ -38,7 +38,7 @@ RUN export TERM=xterm && \
 COPY nginx.conf /etc/nginx/
 COPY conf.d/* /etc/opt/docker-files/
 
-WORKDIR /var/www/${PROJECT_NAME}/${WEBSITE_DIR}
+WORKDIR /var/www/${PROJECT_NAME}
 
 EXPOSE 80 443
 
