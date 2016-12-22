@@ -15,7 +15,7 @@ COPY 00-opcache.ini /usr/local/etc/php/conf.d/
 COPY 00-xdebug.ini /usr/local/etc/php/conf.d/
 
 COPY .bashrc /root/
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY supervisord.conf /etc/supervisor/conf.d/
 
 RUN export TERM=xterm && \
     apt-get clean && apt-get update && apt-get install -y \

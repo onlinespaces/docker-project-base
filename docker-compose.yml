@@ -26,7 +26,7 @@ services:
 
     php-fpm:
         build:
-            context: ./docker/php-fpm
+            context: ./docker/php-fpm/5.6
             args:
                 PROJECT_NAME: ${PROJECT_NAME}
                 XDEBUG_IDE_KEY: ${XDEBUG_IDE_KEY}
