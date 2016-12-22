@@ -61,6 +61,7 @@ services:
                 PROJECT_NAME: ${PROJECT_NAME}
                 PHP_FPM_PORT: ${PHP_FPM_PORT}
                 WEBSITE_DIR: ${WEBSITE_DIR}
+                APPLICATION_TYPE: ${APPLICATION_TYPE}
         restart: always
         expose:
             - "80"
@@ -77,12 +78,9 @@ services:
         image: phpmyadmin/phpmyadmin
         expose:
             - "80"
-#        links:
-#            - mysqldb
         environment:
             PMA_HOST: mysqldb
-            PMA_USER: root
-            PMA_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+
             PHP_UPLOAD_MAX_FILESIZE: 1G
             PHP_MAX_INPUT_VARS: 1G
             VIRTUAL_HOST: ${PHPMYADMIN_DOMAIN_NAME}

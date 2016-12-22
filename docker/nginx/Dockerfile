@@ -5,6 +5,7 @@ ARG DOMAIN_NAME
 ARG PROJECT_NAME
 ARG PHP_FPM_PORT
 ARG WEBSITE_DIR
+ARG APPLICATION_TYPE
 
 RUN apt-get update && apt-get install -y \
         nano \
@@ -24,7 +25,7 @@ RUN ln -sf /dev/stdout /var/log/nginx/access.log && \
     rm -f /etc/nginx/conf.d/*
 
 COPY nginx.conf /etc/nginx/
-COPY conf.d/* /etc/nginx/sites-enabled/
+COPY conf.d/${APPLICATION_TYPE}.conf /etc/nginx/sites-enabled/${PROJECT_NAME}.conf
 
 RUN sed -i "s/#DOMAIN_NAME#/${DOMAIN_NAME}/g" /etc/nginx/sites-enabled/${PROJECT_NAME}.conf && \
     sed -i "s/#PROJECT_NAME#/${PROJECT_NAME}/g" /etc/nginx/sites-enabled/${PROJECT_NAME}.conf && \
