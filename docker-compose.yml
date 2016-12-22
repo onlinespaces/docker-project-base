@@ -57,11 +57,9 @@ services:
         build:
             context: ./docker/nginx
             args:
-                DOMAIN_NAME: ${DOMAIN_NAME}
-                PROJECT_NAME: ${PROJECT_NAME}
-                PHP_FPM_PORT: ${PHP_FPM_PORT}
-                WEBSITE_DIR: ${WEBSITE_DIR}
                 APPLICATION_TYPE: ${APPLICATION_TYPE}
+                PROJECT_NAME: ${PROJECT_NAME}
+                WEBSITE_DIR: ${WEBSITE_DIR}
         restart: always
         expose:
             - "80"
@@ -73,6 +71,8 @@ services:
             - ./logs/nginx:/var/log/nginx
         environment:
             - VIRTUAL_HOST=${DOMAIN_NAME}
+            - DOMAIN_NAME=${DOMAIN_NAME}
+            - PHP_FPM_PORT=${PHP_FPM_PORT}
 
     phpmyadmin:
         image: phpmyadmin/phpmyadmin
@@ -80,7 +80,6 @@ services:
             - "80"
         environment:
             PMA_HOST: mysqldb
-
             PHP_UPLOAD_MAX_FILESIZE: 1G
             PHP_MAX_INPUT_VARS: 1G
             VIRTUAL_HOST: ${PHPMYADMIN_DOMAIN_NAME}

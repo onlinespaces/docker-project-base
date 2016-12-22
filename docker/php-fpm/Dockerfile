@@ -18,7 +18,6 @@ COPY .bashrc /root/
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 RUN export TERM=xterm && \
-
     apt-get clean && apt-get update && apt-get install -y \
     apt-utils \
     apt-transport-https \
