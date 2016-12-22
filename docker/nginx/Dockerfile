@@ -9,6 +9,8 @@ ENV APPLICATION_TYPE=${APPLICATION_TYPE}
 ENV PROJECT_NAME=${PROJECT_NAME}
 ENV WEBSITE_DIR=${WEBSITE_DIR}
 
+ENV TERM xterm
+
 RUN export TERM=xterm && \
     apt-get update && apt-get install -y \
         nano \
