@@ -27,6 +27,7 @@ RUN export TERM=xterm && \
     curl \
     imagemagick \
     graphicsmagick \
+    mysql-client \
     git \
     bzip2 \
     gzip \
@@ -42,6 +43,7 @@ RUN export TERM=xterm && \
     libldap2-dev \
     nano \
     net-tools \
+    openssh-client \
     openssh-server \
     ruby-full \
     supervisor \
