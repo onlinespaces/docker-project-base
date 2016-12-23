@@ -12,7 +12,7 @@ To have a development environment so that only git and docker are required to be
 - MySQL 5.7
 
 ###PHP-FPM
-- PHP7.0
+- PHP7.0 0r 5.6
 - SSH
 - MemCache
 - xDebug
@@ -32,7 +32,7 @@ This is the official MySQL 5.7 release.
 Source:  https://hub.docker.com/_/mysql/
 
 ###NGINX
-The NGINX 1.10.2 release
+The NGINX 1.11 release
 
 Source:  https://hub.docker.com/_/nginx/
 
@@ -60,7 +60,8 @@ Source:  https://hub.docker.com/r/phpmyadmin/phpmyadmin/
 
 ###Settings
 ```bash
-# The type of application. Currently, this is not used.
+# Determines the conf file that is used for nginx
+# Valid values are:  symfony or drupal8
 APPLICATION_TYPE=symfony
 
 # Project Information
@@ -81,7 +82,7 @@ HTTPS_PORT=443
 
 # MYSQL Settings
 MYSQL_ROOT_PASSWORD=root
-MYSQL_DATABASE=symfony
+MYSQL_DATABASE=project
 MYSQL_USER=docker
 MYSQL_PASSWORD=docker
 MYSQL_PORT=3306
@@ -150,13 +151,13 @@ Run ```docker-composer up -d```, then:
 - **Website:**  Visit ```project.local``` in your web browser
 - **PhpMyAdmin:** Visit ```phpmyadmin.local``` in your web browser
    - Use username:  _```root```_ with password:  _```root```_
-- **Kibana**:  ```project.local:81```
+- **Kibana**:  ```elk.local```
 - **Log Locations:** ```logs/nginx``` and ```logs/symfony```
 
 ##Note about SSH
-SSH is installed due to the fact that Docker for Windows does not support interactive commands. 
+Although windows now supports interactive mode (since compose 1.9), SSH seems to give a better experience.
 
-There are work around for this. But, I prefer to just SSH into the container.  It you are developing on a Mac, then, you do not need to install openssh and can comment out or remove those lines.
+SSH items can be removed without affecting anything else.
 
 ##More Info
 After everything is built and running, you should see something like this if you run ```docker-compose ps``` from the command line:
@@ -164,7 +165,7 @@ After everything is built and running, you should see something like this if you
 ```bash
              Name                            Command               State                                  Ports                                 
 -----------------------------------------------------------------------------------------------------------------------------------------------
-dockerprojectbase_db_1            docker-entrypoint.sh mysqld      Up      0.0.0.0:3306->3306/tcp                                               
+dockerprojectbase_mysqldb_1       docker-entrypoint.sh mysqld      Up      0.0.0.0:3306->3306/tcp                                               
 dockerprojectbase_elk_1           /usr/bin/supervisord -n -c ...   Up      80/tcp                                                               
 dockerprojectbase_nginx-proxy_1   /app/docker-entrypoint.sh  ...   Up      0.0.0.0:443->443/tcp, 0.0.0.0:80->80/tcp                             
 dockerprojectbase_nginx_1         nginx -g daemon off;             Up      443/tcp, 80/tcp                                                      
@@ -173,7 +174,7 @@ dockerprojectbase_phpmyadmin_1    /run.sh phpmyadmin               Up      80/tc
 dockerprojectbase_redis_1         docker-entrypoint.sh redis ...   Up      0.0.0.0:6379->6379/tcp                                               
 ```
 ####Containers
-- ```db```: MySQL database
+- ```mysqldb```: MySQL database
 - ```php-fpm```: PHP-FPM. This is where the application code volume is mounted. And, if you use SSH, this is the container you will contect to.
 - ```nginx```:  The Nginx webserver. Also mounted to application code.
 - ```phpmyadmin```: PHPMyAdmin to view database data and information.

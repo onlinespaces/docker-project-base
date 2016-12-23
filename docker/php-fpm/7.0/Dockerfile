@@ -15,10 +15,9 @@ COPY 00-opcache.ini /usr/local/etc/php/conf.d/
 COPY 00-xdebug.ini /usr/local/etc/php/conf.d/
 
 COPY .bashrc /root/
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY supervisord.conf /etc/supervisor/conf.d/
 
 RUN export TERM=xterm && \
-
     apt-get clean && apt-get update && apt-get install -y \
     apt-utils \
     apt-transport-https \
@@ -28,6 +27,7 @@ RUN export TERM=xterm && \
     curl \
     imagemagick \
     graphicsmagick \
+    mysql-client \
     git \
     bzip2 \
     gzip \
@@ -37,11 +37,13 @@ RUN export TERM=xterm && \
     zlib1g-dev \
     libicu-dev \
     libpq-dev \
+    libpng12-dev \
     libmemcached-dev \
     libmcrypt-dev \
     libldap2-dev \
     nano \
     net-tools \
+    openssh-client \
     openssh-server \
     ruby-full \
     supervisor \
@@ -49,6 +51,7 @@ RUN export TERM=xterm && \
     vim-addon-manager \
     vim-vimoutliner \
     vim-doc \
+    wget \
     xz-utils
 
 # Yarn
@@ -64,7 +67,7 @@ RUN curl -Ss https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
 
     # PHP
     pecl install xdebug && \
-    docker-php-ext-install mcrypt opcache intl pdo pdo_mysql && \
+    docker-php-ext-install mcrypt opcache intl pdo pdo_mysql gd && \
     docker-php-ext-enable opcache mcrypt xdebug && \
 
     mkdir -p /var/log/supervisor && \
@@ -144,6 +147,13 @@ RUN apt-get clean && \
 EXPOSE 22 ${PHP_FPM_PORT} ${XDEBUG_REMOTE_PORT}
 
 WORKDIR /var/www/${PROJECT_NAME}
+
+#USER www-data
+#RUN composer global require hirak/prestissimo:^0.3 --optimize-autoloader && \
+#    rm -rf ~/.composer/.cache && \
+#    drupal init --override
+
+USER root
 
 RUN git config --system user.email "${USER_EMAIL}" && \
     git config --system user.name "${USER_NAME}" && \

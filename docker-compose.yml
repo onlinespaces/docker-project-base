@@ -26,7 +26,7 @@ services:
 
     php-fpm:
         build:
-            context: ./docker/php-fpm
+            context: ./docker/php-fpm/7.0
             args:
                 PROJECT_NAME: ${PROJECT_NAME}
                 XDEBUG_IDE_KEY: ${XDEBUG_IDE_KEY}
@@ -57,9 +57,8 @@ services:
         build:
             context: ./docker/nginx
             args:
-                DOMAIN_NAME: ${DOMAIN_NAME}
+                APPLICATION_TYPE: ${APPLICATION_TYPE}
                 PROJECT_NAME: ${PROJECT_NAME}
-                PHP_FPM_PORT: ${PHP_FPM_PORT}
                 WEBSITE_DIR: ${WEBSITE_DIR}
         restart: always
         expose:
@@ -72,17 +71,15 @@ services:
             - ./logs/nginx:/var/log/nginx
         environment:
             - VIRTUAL_HOST=${DOMAIN_NAME}
+            - DOMAIN_NAME=${DOMAIN_NAME}
+            - PHP_FPM_PORT=${PHP_FPM_PORT}
 
     phpmyadmin:
         image: phpmyadmin/phpmyadmin
         expose:
             - "80"
-#        links:
-#            - mysqldb
         environment:
             PMA_HOST: mysqldb
-            PMA_USER: root
-            PMA_PASSWORD: ${MYSQL_ROOT_PASSWORD}
             PHP_UPLOAD_MAX_FILESIZE: 1G
             PHP_MAX_INPUT_VARS: 1G
             VIRTUAL_HOST: ${PHPMYADMIN_DOMAIN_NAME}
