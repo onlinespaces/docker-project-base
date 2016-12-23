@@ -14,36 +14,40 @@ COPY supervisord.conf /etc/supervisor/conf.d/
 
 RUN export TERM=xterm && \
     apt-get clean && apt-get update && apt-get install -y \
-    apt-utils \
-    apt-transport-https \
-    ca-certificates \
-    ctags \
-    indent \
-    curl \
-    imagemagick \
-    graphicsmagick \
-    git \
-    bzip2 \
-    gzip \
-    unzip \
-    zip \
-    openssl \
-    zlib1g-dev \
-    libicu-dev \
-    libpq-dev \
-    libmemcached-dev \
-    libmcrypt-dev \
-    libldap2-dev \
-    nano \
-    net-tools \
-    openssh-server \
-    ruby-full \
-    supervisor \
-    vim \
-    vim-addon-manager \
-    vim-vimoutliner \
-    vim-doc \
-    xz-utils
+        apt-utils \
+        apt-transport-https \
+        ca-certificates \
+        ctags \
+        indent \
+        curl \
+        imagemagick \
+        graphicsmagick \
+        mysql-client \
+        git \
+        bzip2 \
+        gzip \
+        unzip \
+        zip \
+        openssl \
+        zlib1g-dev \
+        libicu-dev \
+        libpq-dev \
+        libpng12-dev \
+        libmemcached-dev \
+        libmcrypt-dev \
+        libldap2-dev \
+        nano \
+        net-tools \
+        openssh-client \
+        openssh-server \
+        ruby-full \
+        supervisor \
+        vim \
+        vim-addon-manager \
+        vim-vimoutliner \
+        vim-doc \
+        wget \
+        xz-utils
 
 # Yarn
 RUN curl -Ss https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
@@ -58,8 +62,8 @@ RUN curl -Ss https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
 
     # PHP
     pecl install xdebug && \
-    docker-php-ext-install mcrypt opcache intl pdo pdo_mysql gd  && \
-    docker-php-ext-enable opcache mcrypt xdebug gd && \
+    docker-php-ext-install mcrypt opcache intl pdo pdo_mysql gd && \
+    docker-php-ext-enable opcache mcrypt xdebug && \
 
     mkdir -p /var/log/supervisor && \
 
