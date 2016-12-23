@@ -36,6 +36,7 @@ RUN export TERM=xterm && \
     zlib1g-dev \
     libicu-dev \
     libpq-dev \
+    libpng12-dev \
     libmemcached-dev \
     libmcrypt-dev \
     libldap2-dev \
@@ -48,7 +49,39 @@ RUN export TERM=xterm && \
     vim-addon-manager \
     vim-vimoutliner \
     vim-doc \
+    wget \
     xz-utils
+
+    # Install imagick
+#    pecl install imagick && \
+#    echo 'extension=imagick.so' > /usr/local/etc/php/conf.d/imagick.ini
+
+    # Install uploadprogess
+#    cd /tmp/ && wget https://github.com/Jan-E/uploadprogress/archive/master.zip && \
+#    unzip master.zip && \
+#    cd uploadprogress-master/ && \
+#    phpize7 && ./configure --with-php-config=/usr/bin/php-config7 && \
+#    make && make install && \
+#    echo 'extension=uploadprogress.so' > /usr/local/etc/php/conf.d/20_uploadprogress.ini && \
+#    cd .. && rm -rf ./master.zip ./uploadprogress-master
+
+# Configure php.ini
+#RUN sed -i \
+#        -e "s/^expose_php.*/expose_php = Off/" \
+#        -e "s/^;date.timezone.*/date.timezone = UTC/" \
+#        -e "s/^memory_limit.*/memory_limit = -1/" \
+#        -e "s/^max_execution_time.*/max_execution_time = 300/" \
+#        -e "s/^; max_input_vars.*/max_input_vars = 2000/" \
+#        -e "s/^post_max_size.*/post_max_size = 512M/" \
+#        -e "s/^upload_max_filesize.*/upload_max_filesize = 512M/" \
+#        -e "s/^error_reporting.*/error_reporting = E_ALL/" \
+#        -e "s/^display_errors.*/display_errors = On/" \
+#        -e "s/^display_startup_errors.*/display_startup_errors = On/" \
+#        -e "s/^track_errors.*/track_errors = On/" \
+#        -e "s/^mysqlnd.collect  _memory_statistics.*/mysqlnd.collect_memory_statistics = On/" \
+#        /usr/local/etc/php/php.ini && \
+#
+#    echo "error_log = \"/proc/self/fd/2\"" | tee -a /usr/local/etc/php/php.ini
 
 # Yarn
 RUN curl -Ss https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
@@ -63,7 +96,7 @@ RUN curl -Ss https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
 
     # PHP
     pecl install xdebug && \
-    docker-php-ext-install mcrypt opcache intl pdo pdo_mysql && \
+    docker-php-ext-install mcrypt opcache intl pdo pdo_mysql gd && \
     docker-php-ext-enable opcache mcrypt xdebug && \
 
     mkdir -p /var/log/supervisor && \
@@ -143,6 +176,13 @@ RUN apt-get clean && \
 EXPOSE 22 ${PHP_FPM_PORT} ${XDEBUG_REMOTE_PORT}
 
 WORKDIR /var/www/${PROJECT_NAME}
+
+#USER www-data
+#RUN composer global require hirak/prestissimo:^0.3 --optimize-autoloader && \
+#    rm -rf ~/.composer/.cache && \
+#    drupal init --override
+
+USER root
 
 RUN git config --system user.email "${USER_EMAIL}" && \
     git config --system user.name "${USER_NAME}" && \
