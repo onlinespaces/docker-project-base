@@ -26,7 +26,7 @@ services:
 
     php-fpm:
         build:
-            context: ./docker/php-fpm/7.0
+            context: ./docker/php-fpm/${PHP_VERSION}
             args:
                 PROJECT_NAME: ${PROJECT_NAME}
                 XDEBUG_IDE_KEY: ${XDEBUG_IDE_KEY}
@@ -40,7 +40,7 @@ services:
             - "${SSH_PUBLIC_PORT}:22"
         volumes:
             - ./${PROJECT_NAME}:/var/www/${PROJECT_NAME}
-            - ./logs/${PROJECT_NAME}:/var/www/${PROJECT_NAME}/var/logs
+            # - ./logs/${PROJECT_NAME}:/var/www/${PROJECT_NAME}/var/logs
         links:
             - mysqldb
             - redis
