@@ -57,7 +57,7 @@ RUN curl -Ss https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
 
     # Set timezone
     rm /etc/localtime && \
-    ln -s ${TIME_ZONE} /etc/localtime && \
+    ln -s /usr/share/zoneinfo/${TIME_ZONE} /etc/localtime && \
     "date" && \
 
     # PHP
