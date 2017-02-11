@@ -33,10 +33,11 @@ services:
                 XDEBUG_REMOTE_PORT: ${XDEBUG_REMOTE_PORT}
                 TIME_ZONE: ${TIME_ZONE}
                 PHP_FPM_PORT: ${PHP_FPM_PORT}
+                IP_ADDRESS: ${IP_ADDRESS}
         restart: always
         ports:
-            - "${PHP_FPM_PORT}:${PHP_FPM_PORT}"
-            - "${XDEBUG_REMOTE_PORT}:${XDEBUG_REMOTE_PORT}"
+#            - "${PHP_FPM_PORT}:${PHP_FPM_PORT}"
+#           - "${XDEBUG_REMOTE_PORT}:${XDEBUG_REMOTE_PORT}"
             - "${SSH_PUBLIC_PORT}:22"
             - "8088:8088"
             - "3001:3001"
@@ -45,9 +46,9 @@ services:
             - ./${PROJECT_NAME}:/var/www/${PROJECT_NAME}
             - ./logs/${PROJECT_NAME}:/var/www/${PROJECT_NAME}/var/logs
             - ./drupal-lab:/var/www/html
-        links:
-            - mysqldb
-            - redis
+#        links:
+#            - mysqldb
+#            - redis
 
     nginx-proxy:
         image: jwilder/nginx-proxy
@@ -67,8 +68,9 @@ services:
         restart: always
         expose:
             - "80"
-        links:
-            - php-fpm
+            - "443"
+#        links:
+#            - php-fpm
         volumes_from:
             - php-fpm
         volumes:

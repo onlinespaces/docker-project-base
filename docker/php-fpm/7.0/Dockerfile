@@ -6,6 +6,7 @@ ARG XDEBUG_IDE_KEY
 ARG XDEBUG_REMOTE_PORT
 ARG TIME_ZONE
 ARG PHP_FPM_PORT
+ARG IP_ADDRESS
 
 ENV TERM xterm
 
@@ -77,6 +78,7 @@ RUN curl -Ss https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
     sed -i "s/listen = 127.0.0.1:9000/listen = 127.0.0.1:${PHP_FPM_PORT}/g" /usr/local/etc/php-fpm.d/www.conf.default && \
     sed -i "s/#XDEBUG_IDE_KEY#/${XDEBUG_IDE_KEY}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
     sed -i "s/#XDEBUG_REMOTE_PORT#/${XDEBUG_REMOTE_PORT}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
+    sed -i "s/#IP_ADDRESS#/${IP_ADDRESS}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
 
     # Show git information in the prompt. For more info see https://github.com/magicmonty/bash-git-prompt
     git clone https://github.com/magicmonty/bash-git-prompt.git /root/.bash-git-prompt --depth=1 && \
