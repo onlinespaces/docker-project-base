@@ -11,6 +11,7 @@ ENV TERM xterm
 
 COPY .bashrc /root/
 COPY supervisord.conf /etc/supervisor/conf.d/
+COPY .gitconfig /root/
 
 RUN export TERM=xterm && \
     apt-get clean && apt-get update && apt-get install -y \
@@ -163,9 +164,9 @@ RUN echo "export VISIBLE=now" >> /etc/profile && \
     # Clean up
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/apk/* && \
-    git config --system user.email "${USER_EMAIL}" && \
-    git config --system user.name "${USER_NAME}" && \
-    sed -i "s/#PHP_FPM_PORT#/${PHP_FPM_PORT}/g" /etc/supervisor/conf.d/supervisord.conf
+    sed -i "s/#PHP_FPM_PORT#/${PHP_FPM_PORT}/g" /etc/supervisor/conf.d/supervisord.conf && \
+        sed -i "s/#USER_EMAIL#/${USER_EMAIL}/g" /root/.gitconfig && \
+         sed -i "s/#USER_NAME#/${USER_NAME}/g" /root/.gitconfig
 
 EXPOSE 22 ${PHP_FPM_PORT} ${XDEBUG_REMOTE_PORT}
 

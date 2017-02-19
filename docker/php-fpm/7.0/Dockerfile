@@ -6,6 +6,7 @@ ARG XDEBUG_IDE_KEY
 ARG XDEBUG_REMOTE_PORT
 ARG TIME_ZONE
 ARG PHP_FPM_PORT
+ARG IP_ADDRESS
 
 ENV TERM xterm
 
@@ -13,7 +14,7 @@ ENV TERM xterm
 # see https://secure.php.net/manual/en/opcache.installation.php
 COPY 00-opcache.ini /usr/local/etc/php/conf.d/
 COPY 00-xdebug.ini /usr/local/etc/php/conf.d/
-
+COPY .gitconfig /root/
 COPY .bashrc /root/
 COPY supervisord.conf /etc/supervisor/conf.d/
 
@@ -77,6 +78,7 @@ RUN curl -Ss https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
     sed -i "s/listen = 127.0.0.1:9000/listen = 127.0.0.1:${PHP_FPM_PORT}/g" /usr/local/etc/php-fpm.d/www.conf.default && \
     sed -i "s/#XDEBUG_IDE_KEY#/${XDEBUG_IDE_KEY}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
     sed -i "s/#XDEBUG_REMOTE_PORT#/${XDEBUG_REMOTE_PORT}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
+    sed -i "s/#IP_ADDRESS#/${IP_ADDRESS}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
 
     # Show git information in the prompt. For more info see https://github.com/magicmonty/bash-git-prompt
     git clone https://github.com/magicmonty/bash-git-prompt.git /root/.bash-git-prompt --depth=1 && \
@@ -153,12 +155,11 @@ WORKDIR /var/www/${PROJECT_NAME}
 #    rm -rf ~/.composer/.cache && \
 #    drupal init --override
 
-USER root
+# USER root
 
-RUN git config --system user.email "${USER_EMAIL}" && \
-    git config --system user.name "${USER_NAME}" && \
-
-    sed -i "s/#PHP_FPM_PORT#/${PHP_FPM_PORT}/g" /etc/supervisor/conf.d/supervisord.conf
+RUN sed -i "s/#PHP_FPM_PORT#/${PHP_FPM_PORT}/g" /etc/supervisor/conf.d/supervisord.conf && \
+    sed -i "s/#USER_EMAIL#/${USER_EMAIL}/g" /root/.gitconfig && \
+     sed -i "s/#USER_NAME#/${USER_NAME}/g" /root/.gitconfig
 
 CMD ["/bin/bash", "-c", "source /root/.bashrc"]
 CMD ["/usr/bin/supervisord"]
