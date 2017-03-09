@@ -37,13 +37,11 @@ services:
         restart: always
         ports:
             - "${SSH_PUBLIC_PORT}:22"
-            - "8088:8088"
             - "3001:3001"
             - "3050:3050"
         volumes:
             - ./${PROJECT_NAME}:/var/www/${PROJECT_NAME}
             - ./logs/${PROJECT_NAME}:/var/www/${PROJECT_NAME}/var/logs
-            - ./drupal-lab:/var/www/html
 
     nginx-proxy:
         image: jwilder/nginx-proxy
