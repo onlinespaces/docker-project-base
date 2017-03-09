@@ -10,14 +10,6 @@ ARG IP_ADDRESS
 
 ENV TERM xterm
 
-# set recommended PHP.ini settings
-# see https://secure.php.net/manual/en/opcache.installation.php
-COPY 00-opcache.ini /usr/local/etc/php/conf.d/
-COPY 00-xdebug.ini /usr/local/etc/php/conf.d/
-COPY .gitconfig /root/
-COPY .bashrc /root/
-COPY supervisord.conf /etc/supervisor/conf.d/
-
 RUN export TERM=xterm && \
     apt-get clean && apt-get update && apt-get install -y \
     apt-utils \
@@ -72,13 +64,6 @@ RUN curl -Ss https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
     docker-php-ext-enable opcache mcrypt xdebug && \
 
     mkdir -p /var/log/supervisor && \
-
-    # Change php fpm port
-    sed -i "s/listen = 127.0.0.1:9000/listen = 127.0.0.1:${PHP_FPM_PORT}/g" /usr/local/etc/php-fpm.d/www.conf && \
-    sed -i "s/listen = 127.0.0.1:9000/listen = 127.0.0.1:${PHP_FPM_PORT}/g" /usr/local/etc/php-fpm.d/www.conf.default && \
-    sed -i "s/#XDEBUG_IDE_KEY#/${XDEBUG_IDE_KEY}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
-    sed -i "s/#XDEBUG_REMOTE_PORT#/${XDEBUG_REMOTE_PORT}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
-    sed -i "s/#IP_ADDRESS#/${IP_ADDRESS}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
 
     # Show git information in the prompt. For more info see https://github.com/magicmonty/bash-git-prompt
     git clone https://github.com/magicmonty/bash-git-prompt.git /root/.bash-git-prompt --depth=1 && \
@@ -146,22 +131,33 @@ RUN echo "export VISIBLE=now" >> /etc/profile
 RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/apk/*
 
-EXPOSE 22 ${PHP_FPM_PORT} ${XDEBUG_REMOTE_PORT}
-
-WORKDIR /var/www/${PROJECT_NAME}
-
 #USER www-data
 #RUN composer global require hirak/prestissimo:^0.3 --optimize-autoloader && \
 #    rm -rf ~/.composer/.cache && \
 #    drupal init --override
 
-# USER root
+#USER root
+# set recommended PHP.ini settings
+# see https://secure.php.net/manual/en/opcache.installation.php
+COPY 00-opcache.ini /usr/local/etc/php/conf.d/
+COPY 00-xdebug.ini /usr/local/etc/php/conf.d/
+COPY .gitconfig /root/
+COPY .bashrc /root/
+COPY supervisord.conf /etc/supervisor/conf.d/
 
-RUN sed -i "s/#PHP_FPM_PORT#/${PHP_FPM_PORT}/g" /etc/supervisor/conf.d/supervisord.conf && \
+# Change php fpm port
+RUN sed -i "s/listen = 127.0.0.1:9000/listen = 127.0.0.1:${PHP_FPM_PORT}/g" /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i "s/listen = 127.0.0.1:9000/listen = 127.0.0.1:${PHP_FPM_PORT}/g" /usr/local/etc/php-fpm.d/www.conf.default && \
+    sed -i "s/#XDEBUG_IDE_KEY#/${XDEBUG_IDE_KEY}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
+    sed -i "s/#XDEBUG_REMOTE_PORT#/${XDEBUG_REMOTE_PORT}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
+    sed -i "s/#IP_ADDRESS#/${IP_ADDRESS}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
+    sed -i "s/#PHP_FPM_PORT#/${PHP_FPM_PORT}/g" /etc/supervisor/conf.d/supervisord.conf && \
     sed -i "s/#USER_EMAIL#/${USER_EMAIL}/g" /root/.gitconfig && \
     sed -i "s/#USER_NAME#/${USER_NAME}/g" /root/.gitconfig
 
-# CMD ["/bin/bash", "-c", "source /root/.bashrc"]
+EXPOSE 22 ${XDEBUG_REMOTE_PORT}
+WORKDIR /var/www/${PROJECT_NAME}
+
 CMD ["/usr/bin/supervisord"]
 
 
