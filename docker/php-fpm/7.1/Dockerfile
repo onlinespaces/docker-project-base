@@ -159,9 +159,9 @@ WORKDIR /var/www/${PROJECT_NAME}
 
 RUN sed -i "s/#PHP_FPM_PORT#/${PHP_FPM_PORT}/g" /etc/supervisor/conf.d/supervisord.conf && \
     sed -i "s/#USER_EMAIL#/${USER_EMAIL}/g" /root/.gitconfig && \
-     sed -i "s/#USER_NAME#/${USER_NAME}/g" /root/.gitconfig
+    sed -i "s/#USER_NAME#/${USER_NAME}/g" /root/.gitconfig
 
-CMD ["/bin/bash", "-c", "source /root/.bashrc"]
+# CMD ["/bin/bash", "-c", "source /root/.bashrc"]
 CMD ["/usr/bin/supervisord"]
 
 

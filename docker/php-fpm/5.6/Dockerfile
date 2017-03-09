@@ -172,7 +172,7 @@ EXPOSE 22 ${PHP_FPM_PORT} ${XDEBUG_REMOTE_PORT}
 
 WORKDIR /var/www/${PROJECT_NAME}
 
-CMD ["/bin/bash", "-c", "source /root/.bashrc"]
+# CMD ["/bin/bash", "-c", "source /root/.bashrc"]
 CMD ["/usr/bin/supervisord"]
 
 
