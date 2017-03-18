@@ -61,9 +61,9 @@ RUN curl -Ss https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
     "date" && \
 
     # PHP
-    pecl install xdebug && \
+    pecl install xdebug zip && \
     docker-php-ext-install mcrypt opcache intl pdo pdo_mysql gd && \
-    docker-php-ext-enable opcache mcrypt xdebug && \
+    docker-php-ext-enable opcache mcrypt xdebug zip && \
 
     mkdir -p /var/log/supervisor && \
 
