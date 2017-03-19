@@ -58,12 +58,12 @@ RUN curl -Ss https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
     # Set timezone
     rm /etc/localtime && \
     ln -s /usr/share/zoneinfo/${TIME_ZONE} /etc/localtime && \
-    "date" && \
+    "date"
 
-    # PHP
-    pecl install xdebug zip && \
-    docker-php-ext-install mcrypt opcache intl pdo pdo_mysql gd && \
-    docker-php-ext-enable opcache mcrypt xdebug zip && \
+# PHP
+RUN pecl install xdebug zip && \
+    docker-php-ext-install mcrypt opcache intl pdo pdo_mysql gd exif && \
+    docker-php-ext-enable opcache mcrypt xdebug zip exif && \
 
     mkdir -p /var/log/supervisor && \
 
