@@ -20,9 +20,13 @@ services:
             - "${SSH_PUBLIC_PORT}:22"
             - "3001:3001"
             - "3050:3050"
+            - "${XDEBUG_REMOTE_PORT}:${XDEBUG_REMOTE_PORT}"
+        expose:
+            - "${PHP_FPM_PORT}"
         volumes:
             - ./${PROJECT_NAME}:/var/www/${PROJECT_NAME}
             - ./logs/${PROJECT_NAME}:/var/www/${PROJECT_NAME}/var/logs
+        tty: true
 
     nginx:
         build:
@@ -43,6 +47,8 @@ services:
             - VIRTUAL_HOST=${DOMAIN_NAME}
             - DOMAIN_NAME=${DOMAIN_NAME}
             - PHP_FPM_PORT=${PHP_FPM_PORT}
+        links:
+            - php-fpm
 
     mysqldb:
         build:
