@@ -1,28 +1,6 @@
 version: '2'
 
 services:
-    mysqldb:
-        build:
-            context: ./docker/mysql
-            args:
-                CHAR_SET_SERVER: ${CHAR_SET_SERVER}
-                COLLATION_SERVER: ${COLLATION_SERVER}
-                DEFAULT_CHAR_SET: ${DEFAULT_CHAR_SET}
-        ports:
-            - "${MYSQL_PORT}:3306"
-        restart: always
-        environment:
-            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-            MYSQL_DATABASE: ${MYSQL_DATABASE}
-            MYSQL_USER: ${MYSQL_USER}
-            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-        volumes:
-            - ./data/mysql:/var/lib/mysql
-
-    redis:
-        image: redis:3.2-alpine
-        ports:
-            - "6379:6379"
 
     php-fpm:
         build:
@@ -36,6 +14,7 @@ services:
                 IP_ADDRESS: ${IP_ADDRESS}
                 USER_EMAIL: ${USER_EMAIL}
                 USER_NAME: ${USER_NAME}
+                XDEBUG_REMOTE_CONNECT_BACK: ${XDEBUG_REMOTE_CONNECT_BACK}
         restart: always
         ports:
             - "${SSH_PUBLIC_PORT}:22"
@@ -44,14 +23,6 @@ services:
         volumes:
             - ./${PROJECT_NAME}:/var/www/${PROJECT_NAME}
             - ./logs/${PROJECT_NAME}:/var/www/${PROJECT_NAME}/var/logs
-
-    nginx-proxy:
-        image: jwilder/nginx-proxy
-        ports:
-            - "${HTTP_PORT}:80"
-            - "${HTTPS_PORT}:443"
-        volumes:
-            - /var/run/docker.sock:/tmp/docker.sock:ro
 
     nginx:
         build:
@@ -73,15 +44,41 @@ services:
             - DOMAIN_NAME=${DOMAIN_NAME}
             - PHP_FPM_PORT=${PHP_FPM_PORT}
 
+    mysqldb:
+        build:
+            context: ./docker/mysql
+            args:
+                CHAR_SET_SERVER: ${CHAR_SET_SERVER}
+                COLLATION_SERVER: ${COLLATION_SERVER}
+                DEFAULT_CHAR_SET: ${DEFAULT_CHAR_SET}
+        ports:
+            - "${MYSQL_PORT}:3306"
+        restart: always
+        environment:
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+            MYSQL_DATABASE: ${MYSQL_DATABASE}
+            MYSQL_USER: ${MYSQL_USER}
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+        volumes:
+            - ./data/mysql:/var/lib/mysql
+
     phpmyadmin:
         image: phpmyadmin/phpmyadmin
         expose:
             - "80"
         environment:
             PMA_HOST: mysqldb
-            PHP_UPLOAD_MAX_FILESIZE: 1G
-            PHP_MAX_INPUT_VARS: 1G
+            PHP_UPLOAD_MAX_FILESIZE: 4G
+            PHP_MAX_INPUT_VARS: 4G
             VIRTUAL_HOST: ${PHPMYADMIN_DOMAIN_NAME}
+
+    nginx-proxy:
+        image: jwilder/nginx-proxy
+        ports:
+            - "${HTTP_PORT}:80"
+            - "${HTTPS_PORT}:443"
+        volumes:
+            - /var/run/docker.sock:/tmp/docker.sock:ro
 
     elk:
         image: willdurand/elk
@@ -95,3 +92,8 @@ services:
             - nginx
         environment:
             - VIRTUAL_HOST=${ELK_DOMAIN_NAME}
+
+    redis:
+        image: redis:3.2-alpine
+        ports:
+            - "6379:6379"
