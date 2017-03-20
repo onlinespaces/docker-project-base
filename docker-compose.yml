@@ -15,14 +15,14 @@ services:
                 USER_EMAIL: ${USER_EMAIL}
                 USER_NAME: ${USER_NAME}
                 XDEBUG_REMOTE_CONNECT_BACK: ${XDEBUG_REMOTE_CONNECT_BACK}
+        environment:
+                PHP_XDEBUG_REMOTE_HOST: ${IP_ADDRESS}
+                PHP_IDE_CONFIG: serverName=${DOMAIN_NAME}
         restart: always
         ports:
             - "${SSH_PUBLIC_PORT}:22"
             - "3001:3001"
             - "3050:3050"
-            - "${XDEBUG_REMOTE_PORT}:${XDEBUG_REMOTE_PORT}"
-        expose:
-            - "${PHP_FPM_PORT}"
         volumes:
             - ./${PROJECT_NAME}:/var/www/${PROJECT_NAME}
             - ./logs/${PROJECT_NAME}:/var/www/${PROJECT_NAME}/var/logs
