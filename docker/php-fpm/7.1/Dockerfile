@@ -4,6 +4,7 @@ MAINTAINER Scott Collier <scott@onlinespaces.com>
 ARG PROJECT_NAME
 ARG XDEBUG_IDE_KEY
 ARG XDEBUG_REMOTE_PORT
+ARG XDEBUG_REMOTE_CONNECT_BACK
 ARG TIME_ZONE
 ARG PHP_FPM_PORT
 ARG IP_ADDRESS
@@ -33,6 +34,9 @@ RUN export TERM=xterm && \
     libicu-dev \
     libpq-dev \
     libpng12-dev \
+    libgd-dev \
+    libfreetype6-dev \
+    libjpeg62-turbo-dev \
     libmemcached-dev \
     libmcrypt-dev \
     libldap2-dev \
@@ -62,7 +66,9 @@ RUN curl -Ss https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
 
 # PHP
 RUN pecl install xdebug zip && \
-    docker-php-ext-install mcrypt opcache intl pdo pdo_mysql gd exif && \
+    docker-php-ext-install mcrypt opcache intl pdo pdo_mysql exif iconv && \
+    docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ && \
+    docker-php-ext-install gd && \
     docker-php-ext-enable opcache mcrypt xdebug zip exif && \
 
     mkdir -p /var/log/supervisor && \
@@ -152,12 +158,14 @@ RUN sed -i "s/listen = 127.0.0.1:9000/listen = 127.0.0.1:${PHP_FPM_PORT}/g" /usr
     sed -i "s/listen = 127.0.0.1:9000/listen = 127.0.0.1:${PHP_FPM_PORT}/g" /usr/local/etc/php-fpm.d/www.conf.default && \
     sed -i "s/#XDEBUG_IDE_KEY#/${XDEBUG_IDE_KEY}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
     sed -i "s/#XDEBUG_REMOTE_PORT#/${XDEBUG_REMOTE_PORT}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
+    sed -i "s/#XDEBUG_REMOTE_CONNECT_BACK#/${XDEBUG_REMOTE_CONNECT_BACK}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
+    sed -i "s/#PROJECT_NAME#/${PROJECT_NAME}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
     sed -i "s/#IP_ADDRESS#/${IP_ADDRESS}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
     sed -i "s/#PHP_FPM_PORT#/${PHP_FPM_PORT}/g" /etc/supervisor/conf.d/supervisord.conf && \
     sed -i "s/#USER_EMAIL#/${USER_EMAIL}/g" /root/.gitconfig && \
     sed -i "s/#USER_NAME#/${USER_NAME}/g" /root/.gitconfig
 
-EXPOSE 22 ${XDEBUG_REMOTE_PORT}
+EXPOSE 22
 WORKDIR /var/www/${PROJECT_NAME}
 
 CMD ["/usr/bin/supervisord"]
