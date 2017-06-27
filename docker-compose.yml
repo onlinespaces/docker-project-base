@@ -1,7 +1,6 @@
 version: '2'
 
 services:
-
     php-fpm:
         build:
             context: ./docker/php-fpm/${PHP_VERSION}
@@ -23,6 +22,7 @@ services:
             - "${SSH_PUBLIC_PORT}:22"
             - "3001:3001"
             - "3050:3050"
+            - "8080:8080"
         volumes:
             - ./${PROJECT_NAME}:/var/www/${PROJECT_NAME}
             - ./logs/${PROJECT_NAME}:/var/www/${PROJECT_NAME}/var/logs
