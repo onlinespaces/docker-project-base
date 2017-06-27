@@ -66,12 +66,14 @@ RUN curl -Ss https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
 
 # PHP
 RUN pecl install xdebug zip && \
-    docker-php-ext-install mcrypt opcache intl pdo pdo_mysql exif iconv && \
-    docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ && \
-    docker-php-ext-install gd && \
-    docker-php-ext-enable opcache mcrypt xdebug zip exif && \
+    docker-php-ext-install mcrypt opcache intl pdo pdo_mysql exif iconv
 
-    mkdir -p /var/log/supervisor && \
+RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ && \
+    docker-php-ext-install gd
+
+RUN docker-php-ext-enable opcache xdebug
+
+RUN mkdir -p /var/log/supervisor && \
 
     # Show git information in the prompt. For more info see https://github.com/magicmonty/bash-git-prompt
     git clone https://github.com/magicmonty/bash-git-prompt.git /root/.bash-git-prompt --depth=1 && \
