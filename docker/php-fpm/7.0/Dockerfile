@@ -14,6 +14,7 @@ ENV TERM xterm
 # see https://secure.php.net/manual/en/opcache.installation.php
 COPY 00-opcache.ini /usr/local/etc/php/conf.d/
 COPY 00-xdebug.ini /usr/local/etc/php/conf.d/
+COPY 00-php.ini /usr/local/etc/php/conf.d/
 COPY .gitconfig /root/
 COPY .bashrc /root/
 COPY supervisord.conf /etc/supervisor/conf.d/
@@ -79,9 +80,10 @@ RUN curl -Ss https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
     sed -i "s/#XDEBUG_IDE_KEY#/${XDEBUG_IDE_KEY}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
     sed -i "s/#XDEBUG_REMOTE_PORT#/${XDEBUG_REMOTE_PORT}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
     sed -i "s/#IP_ADDRESS#/${IP_ADDRESS}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
+    echo "request_terminate_timeout = 600" >> /usr/local/etc/php-fpm.d/www.conf
 
     # Show git information in the prompt. For more info see https://github.com/magicmonty/bash-git-prompt
-    git clone https://github.com/magicmonty/bash-git-prompt.git /root/.bash-git-prompt --depth=1 && \
+ RUN git clone https://github.com/magicmonty/bash-git-prompt.git /root/.bash-git-prompt --depth=1 && \
 
     # Node
     curl -sL https://deb.nodesource.com/setup_6.x | bash - && \
