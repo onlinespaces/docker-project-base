@@ -1,4 +1,4 @@
-FROM nginx:1.11
+FROM nginx:1.13
 MAINTAINER Scott Collier <scott@onlinespaces.com>
 
 ARG APPLICATION_TYPE

@@ -40,6 +40,7 @@ RUN export TERM=xterm && \
     libmemcached-dev \
     libmcrypt-dev \
     libldap2-dev \
+    libzip-dev \
     nano \
     net-tools \
     openssh-client \
@@ -56,9 +57,7 @@ RUN export TERM=xterm && \
 # Yarn
 RUN curl -Ss https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
     echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
-
     apt-get update && apt-get install -y yarn && \
-
     # Set timezone
     rm /etc/localtime && \
     ln -s /usr/share/zoneinfo/${TIME_ZONE} /etc/localtime && \
@@ -74,61 +73,50 @@ RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-di
 RUN docker-php-ext-enable opcache xdebug
 
 RUN mkdir -p /var/log/supervisor && \
-
     # Show git information in the prompt. For more info see https://github.com/magicmonty/bash-git-prompt
-    git clone https://github.com/magicmonty/bash-git-prompt.git /root/.bash-git-prompt --depth=1 && \
+    git clone https://github.com/magicmonty/bash-git-prompt.git /root/.bash-git-prompt --depth=1
 
     # Node
-    curl -sL https://deb.nodesource.com/setup_6.x | bash - && \
+RUN curl -sL https://deb.nodesource.com/setup_8.x | bash - && \
     apt-get install -y nodejs && \
-
     # NVM
-    curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.32.1/install.sh | bash && \
-
+    curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.8/install.sh | bash && \
     # Disable progress bars by default: https://github.com/npm/npm/issues/11283
     bash -l -c "npm set progress=false" && \
-
     # Install Compass
     gem update --system && gem install compass && \
-
     # Install Composer
-    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
-    composer --version && \
+    #curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
+    #composer --version && \
+    php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
+    php composer-setup.php && \
+    php -r "unlink('composer-setup.php');" && \
+    # Install webpack
+    npm install --global webpack && \
+    # Install Bower
+    npm install -g bower && \
+    # Install Gulp
+    npm install -g gulp-cli && \
+    # Install Grunt
+    npm install -g grunt-cli
 
-    # Install PHPUnit
-    curl -sSL https://phar.phpunit.de/phpunit.phar -o phpunit.phar && \
+# PHPUnit
+RUN curl -sSL https://phar.phpunit.de/phpunit.phar -o phpunit.phar && \
     chmod +x phpunit.phar && \
     mv phpunit.phar /usr/local/bin/phpunit && \
-
     # Install Drush
     php -r "readfile('https://s3.amazonaws.com/files.drush.org/drush.phar');" > /usr/local/bin/drush && \
     chmod +x /usr/local/bin/drush && \
-
     # Install Drupal Console
     curl https://drupalconsole.com/installer -o /usr/local/bin/drupal && \
     chmod +x /usr/local/bin/drupal && \
-
     # Add default drush aliases
-    mkdir -p /etc/drush/site-aliases && \
+    mkdir -p /etc/drush/site-aliases
 
-    # Install Bower
-    npm install -g bower && \
-
-    # Install Gulp
-    npm install -g gulp-cli && \
-
-    # Install Grunt
-    npm install -g grunt-cli && \
-
-    # Symfony Executable
-    curl -LsS https://symfony.com/installer -o /usr/local/bin/symfony && \
-    chmod a+x /usr/local/bin/symfony && \
-
-    # SSH - Because docker does not work interactively on windows
-    mkdir /var/run/sshd && \
+# SSH - Because docker does not work interactively on windows
+RUN mkdir /var/run/sshd && \
     echo 'root:password' | chpasswd && \
     sed -i 's/PermitRootLogin without-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
-
     # SSH login fix. Otherwise user is kicked off after login
     sed -i 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' /etc/pam.d/sshd
 
@@ -140,11 +128,6 @@ RUN echo "export VISIBLE=now" >> /etc/profile
 # Clean up
 RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/apk/*
-
-#USER www-data
-#RUN composer global require hirak/prestissimo:^0.3 --optimize-autoloader && \
-#    rm -rf ~/.composer/.cache && \
-#    drupal init --override
 
 #USER root
 # set recommended PHP.ini settings
