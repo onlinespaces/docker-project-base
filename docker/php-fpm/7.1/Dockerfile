@@ -67,6 +67,11 @@ RUN apt-get update &&\
 RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/apk/*
 
+# Install PHPUnit
+RUN wget https://phar.phpunit.de/phpunit.phar &&\
+    chmod +x phpunit.phar &&\
+    mv phpunit.phar /usr/local/bin/phpunit
+
 #USER root
 # set recommended PHP.ini settings
 # see https://secure.php.net/manual/en/opcache.installation.php
@@ -76,8 +81,23 @@ COPY .gitconfig /root/
 COPY .bashrc /root/
 COPY supervisord.conf /etc/supervisor/conf.d/
 
+# Change php fpm port
+RUN sed -i "s/listen = 127.0.0.1:9000/listen = 127.0.0.1:${PHP_FPM_PORT}/g" /etc/php/7.1/fpm/pool.d/www.conf && \
+    sed -i "s/#XDEBUG_IDE_KEY#/${XDEBUG_IDE_KEY}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
+    sed -i "s/#XDEBUG_REMOTE_PORT#/${XDEBUG_REMOTE_PORT}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
+    sed -i "s/#XDEBUG_REMOTE_CONNECT_BACK#/${XDEBUG_REMOTE_CONNECT_BACK}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
+    sed -i "s/#PROJECT_NAME#/${PROJECT_NAME}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
+    sed -i "s/#IP_ADDRESS#/${IP_ADDRESS}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
+    sed -i "s/#PHP_FPM_PORT#/${PHP_FPM_PORT}/g" /etc/supervisor/conf.d/supervisord.conf && \
+    sed -i "s/#USER_EMAIL#/${USER_EMAIL}/g" /root/.gitconfig && \
+    sed -i "s/#USER_NAME#/${USER_NAME}/g" /root/.gitconfig
+
 # Show git information in the prompt. For more info see https://github.com/magicmonty/bash-git-prompt
 RUN git clone https://github.com/magicmonty/bash-git-prompt.git /root/.bash-git-prompt --depth=1
+
+# Yarn
+#RUN curl -sL https://deb.nodesource.com/setup_8.x | bash - &&\
+#    sudo apt-get install -y nodejs
 
 # Yarn
 #RUN curl -Ss https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
@@ -114,31 +134,6 @@ RUN git clone https://github.com/magicmonty/bash-git-prompt.git /root/.bash-git-
 #    npm install -g gulp-cli && \
 #    # Install Grunt
 #    npm install -g grunt-cli
-
-# PHPUnit
-#RUN curl -sSL https://phar.phpunit.de/phpunit.phar -o phpunit.phar && \
-#    chmod +x phpunit.phar && \
-#    mv phpunit.phar /usr/local/bin/phpunit && \
-#    # Install Drush
-#    php -r "readfile('https://s3.amazonaws.com/files.drush.org/drush.phar');" > /usr/local/bin/drush && \
-#    chmod +x /usr/local/bin/drush && \
-#    # Install Drupal Console
-#    curl https://drupalconsole.com/installer -o /usr/local/bin/drupal && \
-#    chmod +x /usr/local/bin/drupal && \
-#    # Add default drush aliases
-#    mkdir -p /etc/drush/site-aliases
-
-# Change php fpm port
-RUN sed -i "s/listen = 127.0.0.1:9000/listen = 127.0.0.1:${PHP_FPM_PORT}/g" /usr/local/etc/php-fpm.d/www.conf && \
-    sed -i "s/listen = 127.0.0.1:9000/listen = 127.0.0.1:${PHP_FPM_PORT}/g" /usr/local/etc/php-fpm.d/www.conf.default && \
-    sed -i "s/#XDEBUG_IDE_KEY#/${XDEBUG_IDE_KEY}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
-    sed -i "s/#XDEBUG_REMOTE_PORT#/${XDEBUG_REMOTE_PORT}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
-    sed -i "s/#XDEBUG_REMOTE_CONNECT_BACK#/${XDEBUG_REMOTE_CONNECT_BACK}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
-    sed -i "s/#PROJECT_NAME#/${PROJECT_NAME}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
-    sed -i "s/#IP_ADDRESS#/${IP_ADDRESS}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
-    sed -i "s/#PHP_FPM_PORT#/${PHP_FPM_PORT}/g" /etc/supervisor/conf.d/supervisord.conf && \
-    sed -i "s/#USER_EMAIL#/${USER_EMAIL}/g" /root/.gitconfig && \
-    sed -i "s/#USER_NAME#/${USER_NAME}/g" /root/.gitconfig
 
 EXPOSE 22
 WORKDIR /var/www/${PROJECT_NAME}
