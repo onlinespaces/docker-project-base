@@ -17,8 +17,8 @@ RUN apt-get clean && apt-get update && apt-get install -y \
     openssl \
     nano \
     openssh-server \
-    ruby-full \
-    supervisor
+    supervisor \
+    curl
 
 # Clean up
 RUN apt-get clean && \
@@ -35,6 +35,36 @@ RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so
 ENV NOTVISIBLE "in users profile"
 RUN echo "export VISIBLE=now" >> /etc/profile
 
+#languages
+RUN apt-get update &&\
+    apt-get install language-pack-en -y &&\
+    apt-get install -y python-software-properties software-properties-common && \
+    LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php && \
+    apt-get update -y && \
+    apt-get install -y \
+    php7.1 \
+    php7.1-bcmath \
+    php7.1-cli \
+    php7.1-common \
+    php7.1-curl \
+    php7.1-dev \
+    php7.1-fpm \
+    php7.1-gd \
+    php7.1-intl \
+    php7.1-json \
+    php7.1-mbstring \
+    php7.1-mcrypt \
+    php7.1-mysql \
+    php7.1-opcache \
+    php7.1-soap \
+    php7.1-xdebug \
+    php7.1-xml \
+    php7.1-zip \
+    ruby-full
+
+# Clean up
+RUN apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/apk/*
 
 # Yarn
 #RUN curl -Ss https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
@@ -54,7 +84,7 @@ RUN echo "export VISIBLE=now" >> /etc/profile
 #
 #RUN docker-php-ext-enable opcache xdebug
 
-RUN mkdir -p /var/log/supervisor
+
     # Show git information in the prompt. For more info see https://github.com/magicmonty/bash-git-prompt
 #RUN git clone https://github.com/magicmonty/bash-git-prompt.git /root/.bash-git-prompt --depth=1
 
@@ -96,12 +126,13 @@ RUN mkdir -p /var/log/supervisor
 #    mkdir -p /etc/drush/site-aliases
 
 
+RUN mkdir -p /var/log/supervisor
 
 #USER root
 # set recommended PHP.ini settings
 # see https://secure.php.net/manual/en/opcache.installation.php
-#COPY 00-opcache.ini /usr/local/etc/php/conf.d/
-#COPY 00-xdebug.ini /usr/local/etc/php/conf.d/
+COPY 00-opcache.ini /usr/local/etc/php/conf.d/
+COPY 00-xdebug.ini /usr/local/etc/php/conf.d/
 #COPY .gitconfig /root/
 COPY .bashrc /root/
 COPY supervisord.conf /etc/supervisor/conf.d/
