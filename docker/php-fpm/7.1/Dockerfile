@@ -34,6 +34,7 @@ RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so
 
 ENV NOTVISIBLE "in users profile"
 RUN echo "export VISIBLE=now" >> /etc/profile
+RUN mkdir -p /var/log/supervisor
 
 #languages
 RUN apt-get update &&\
@@ -66,6 +67,18 @@ RUN apt-get update &&\
 RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/apk/*
 
+#USER root
+# set recommended PHP.ini settings
+# see https://secure.php.net/manual/en/opcache.installation.php
+COPY 00-opcache.ini /usr/local/etc/php/conf.d/
+COPY 00-xdebug.ini /usr/local/etc/php/conf.d/
+COPY .gitconfig /root/
+COPY .bashrc /root/
+COPY supervisord.conf /etc/supervisor/conf.d/
+
+# Show git information in the prompt. For more info see https://github.com/magicmonty/bash-git-prompt
+RUN git clone https://github.com/magicmonty/bash-git-prompt.git /root/.bash-git-prompt --depth=1
+
 # Yarn
 #RUN curl -Ss https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
 #    echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
@@ -75,17 +88,7 @@ RUN apt-get clean && \
 #    ln -s /usr/share/zoneinfo/${TIME_ZONE} /etc/localtime && \
 #    "date"
 
-# PHP
-#RUN pecl install xdebug zip && \
-#    docker-php-ext-install mcrypt opcache intl pdo pdo_mysql exif iconv
-#
-#RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ && \
-#    docker-php-ext-install gd
-#
-#RUN docker-php-ext-enable opcache xdebug
-
-
-    # Show git information in the prompt. For more info see https://github.com/magicmonty/bash-git-prompt
+# Show git information in the prompt. For more info see https://github.com/magicmonty/bash-git-prompt
 #RUN git clone https://github.com/magicmonty/bash-git-prompt.git /root/.bash-git-prompt --depth=1
 
 # Node
@@ -125,29 +128,17 @@ RUN apt-get clean && \
 #    # Add default drush aliases
 #    mkdir -p /etc/drush/site-aliases
 
-
-RUN mkdir -p /var/log/supervisor
-
-#USER root
-# set recommended PHP.ini settings
-# see https://secure.php.net/manual/en/opcache.installation.php
-COPY 00-opcache.ini /usr/local/etc/php/conf.d/
-COPY 00-xdebug.ini /usr/local/etc/php/conf.d/
-#COPY .gitconfig /root/
-COPY .bashrc /root/
-COPY supervisord.conf /etc/supervisor/conf.d/
-
 # Change php fpm port
-#RUN sed -i "s/listen = 127.0.0.1:9000/listen = 127.0.0.1:${PHP_FPM_PORT}/g" /usr/local/etc/php-fpm.d/www.conf && \
-#    sed -i "s/listen = 127.0.0.1:9000/listen = 127.0.0.1:${PHP_FPM_PORT}/g" /usr/local/etc/php-fpm.d/www.conf.default && \
-#    sed -i "s/#XDEBUG_IDE_KEY#/${XDEBUG_IDE_KEY}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
-#    sed -i "s/#XDEBUG_REMOTE_PORT#/${XDEBUG_REMOTE_PORT}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
-#    sed -i "s/#XDEBUG_REMOTE_CONNECT_BACK#/${XDEBUG_REMOTE_CONNECT_BACK}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
-#    sed -i "s/#PROJECT_NAME#/${PROJECT_NAME}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
-#    sed -i "s/#IP_ADDRESS#/${IP_ADDRESS}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
-#    sed -i "s/#PHP_FPM_PORT#/${PHP_FPM_PORT}/g" /etc/supervisor/conf.d/supervisord.conf && \
-#    sed -i "s/#USER_EMAIL#/${USER_EMAIL}/g" /root/.gitconfig && \
-#    sed -i "s/#USER_NAME#/${USER_NAME}/g" /root/.gitconfig
+RUN sed -i "s/listen = 127.0.0.1:9000/listen = 127.0.0.1:${PHP_FPM_PORT}/g" /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i "s/listen = 127.0.0.1:9000/listen = 127.0.0.1:${PHP_FPM_PORT}/g" /usr/local/etc/php-fpm.d/www.conf.default && \
+    sed -i "s/#XDEBUG_IDE_KEY#/${XDEBUG_IDE_KEY}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
+    sed -i "s/#XDEBUG_REMOTE_PORT#/${XDEBUG_REMOTE_PORT}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
+    sed -i "s/#XDEBUG_REMOTE_CONNECT_BACK#/${XDEBUG_REMOTE_CONNECT_BACK}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
+    sed -i "s/#PROJECT_NAME#/${PROJECT_NAME}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
+    sed -i "s/#IP_ADDRESS#/${IP_ADDRESS}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
+    sed -i "s/#PHP_FPM_PORT#/${PHP_FPM_PORT}/g" /etc/supervisor/conf.d/supervisord.conf && \
+    sed -i "s/#USER_EMAIL#/${USER_EMAIL}/g" /root/.gitconfig && \
+    sed -i "s/#USER_NAME#/${USER_NAME}/g" /root/.gitconfig
 
 EXPOSE 22
 WORKDIR /var/www/${PROJECT_NAME}
