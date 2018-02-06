@@ -22,7 +22,7 @@ RUN apt-get clean && apt-get update && apt-get install -y \
 
 # Clean up
 RUN apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/apk/*
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/apk/* /var/cache/apt/archives/*
 
 # SSH Server - This is needed for windows development because
 RUN mkdir /var/run/sshd
@@ -40,8 +40,9 @@ RUN mkdir -p /var/log/supervisor
 RUN apt-get update &&\
     apt-get install language-pack-en -y &&\
     apt-get install -y python-software-properties software-properties-common && \
-    LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php && \
-    apt-get update -y && \
+    LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
+
+RUN apt-get clean && apt-get update -y && \
     apt-get install -y \
     php7.1 \
     php7.1-bcmath \
@@ -60,12 +61,11 @@ RUN apt-get update &&\
     php7.1-soap \
     php7.1-xdebug \
     php7.1-xml \
-    php7.1-zip \
-    ruby-full
+    php7.1-zip
 
 # Clean up
 RUN apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/apk/*
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/apk/* /var/cache/apt/archives/*
 
 # Install PHPUnit
 RUN wget https://phar.phpunit.de/phpunit.phar &&\
@@ -81,9 +81,11 @@ COPY .gitconfig /root/
 COPY .bashrc /root/
 COPY supervisord.conf /etc/supervisor/conf.d/
 
+RUN sed -i -e "s/listen = \/run\/php\/php7.1-fpm.sock/listen = 127.0.0.1:${PHP_FPM_PORT}/g" /etc/php/7.1/fpm/pool.d/www.conf \
+    && sed -i -e "s/;daemonize = yes/daemonize = no/g" /etc/php/7.1/fpm/php-fpm.conf
+
 # Change php fpm port
-RUN sed -i "s/listen = 127.0.0.1:9000/listen = 127.0.0.1:${PHP_FPM_PORT}/g" /etc/php/7.1/fpm/pool.d/www.conf && \
-    sed -i "s/#XDEBUG_IDE_KEY#/${XDEBUG_IDE_KEY}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
+RUN sed -i "s/#XDEBUG_IDE_KEY#/${XDEBUG_IDE_KEY}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
     sed -i "s/#XDEBUG_REMOTE_PORT#/${XDEBUG_REMOTE_PORT}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
     sed -i "s/#XDEBUG_REMOTE_CONNECT_BACK#/${XDEBUG_REMOTE_CONNECT_BACK}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
     sed -i "s/#PROJECT_NAME#/${PROJECT_NAME}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
@@ -95,6 +97,8 @@ RUN sed -i "s/listen = 127.0.0.1:9000/listen = 127.0.0.1:${PHP_FPM_PORT}/g" /etc
 # Show git information in the prompt. For more info see https://github.com/magicmonty/bash-git-prompt
 RUN git clone https://github.com/magicmonty/bash-git-prompt.git /root/.bash-git-prompt --depth=1
 
+
+RUN mkdir -p /run/php && chmod 777 /run/php
 # Yarn
 #RUN curl -sL https://deb.nodesource.com/setup_8.x | bash - &&\
 #    sudo apt-get install -y nodejs
@@ -136,6 +140,7 @@ RUN git clone https://github.com/magicmonty/bash-git-prompt.git /root/.bash-git-
 #    npm install -g grunt-cli
 
 EXPOSE 22
+EXPOSE 9000
 WORKDIR /var/www/${PROJECT_NAME}
 
 CMD ["/usr/bin/supervisord"]
