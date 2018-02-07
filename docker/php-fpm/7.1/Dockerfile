@@ -97,47 +97,31 @@ RUN sed -i "s/#XDEBUG_IDE_KEY#/${XDEBUG_IDE_KEY}/g" /usr/local/etc/php/conf.d/00
 # Show git information in the prompt. For more info see https://github.com/magicmonty/bash-git-prompt
 RUN git clone https://github.com/magicmonty/bash-git-prompt.git /root/.bash-git-prompt --depth=1
 
-
 RUN mkdir -p /run/php && chmod 777 /run/php
-# Yarn
-#RUN curl -sL https://deb.nodesource.com/setup_8.x | bash - &&\
-#    sudo apt-get install -y nodejs
+
+# Set timezone
+RUN rm /etc/localtime && \
+    ln -s /usr/share/zoneinfo/${TIME_ZONE} /etc/localtime && \
+    "date"
 
 # Yarn
-#RUN curl -Ss https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
-#    echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
-#    apt-get update && apt-get install -y yarn && \
-#    # Set timezone
-#    rm /etc/localtime && \
-#    ln -s /usr/share/zoneinfo/${TIME_ZONE} /etc/localtime && \
-#    "date"
+RUN curl -sL https://deb.nodesource.com/setup_8.x | bash - &&\
+    apt-get install -y nodejs
 
-# Show git information in the prompt. For more info see https://github.com/magicmonty/bash-git-prompt
-#RUN git clone https://github.com/magicmonty/bash-git-prompt.git /root/.bash-git-prompt --depth=1
+# Yarn
+RUN curl -Ss https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
+    echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
+    apt-get update && apt-get install -y yarn
 
-# Node
-#RUN curl -sL https://deb.nodesource.com/setup_8.x | bash - && \
-#    apt-get install -y nodejs && \
-#    # NVM
-#    curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.8/install.sh | bash && \
-#    # Disable progress bars by default: https://github.com/npm/npm/issues/11283
-#    bash -l -c "npm set progress=false" && \
-#    # Install Compass
-#    gem update --system && gem install compass && \
-#    # Install Composer
-#    #curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
-#    #composer --version && \
-#    php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
-#    php composer-setup.php && \
-#    php -r "unlink('composer-setup.php');" && \
-#    # Install webpack
-#    npm install --global webpack && \
-#    # Install Bower
-#    npm install -g bower && \
-#    # Install Gulp
-#    npm install -g gulp-cli && \
-#    # Install Grunt
-#    npm install -g grunt-cli
+RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
+        php composer-setup.php && \
+        php -r "unlink('composer-setup.php');" && \
+        # Install webpack
+        npm install --global webpack && \
+        # Install Bower
+        npm install -g bower && \
+        # Install Gulp
+        npm install -g gulp-cli
 
 EXPOSE 22
 EXPOSE 9000
