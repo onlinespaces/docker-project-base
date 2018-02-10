@@ -75,8 +75,8 @@ RUN wget https://phar.phpunit.de/phpunit.phar &&\
 #USER root
 # set recommended PHP.ini settings
 # see https://secure.php.net/manual/en/opcache.installation.php
-COPY 00-opcache.ini /usr/local/etc/php/conf.d/
-COPY 00-xdebug.ini /usr/local/etc/php/conf.d/
+COPY 99-opcache.ini /etc/php/7.1/fpm/conf.d/
+COPY 99-xdebug.ini /etc/php/7.1/fpm/conf.d/
 COPY .gitconfig /root/
 COPY .bashrc /root/
 COPY supervisord.conf /etc/supervisor/conf.d/
@@ -85,11 +85,11 @@ RUN sed -i -e "s/listen = \/run\/php\/php7.1-fpm.sock/listen = 0.0.0.0:${PHP_FPM
     && sed -i -e "s/;daemonize = yes/daemonize = no/g" /etc/php/7.1/fpm/php-fpm.conf
 
 # Change php fpm port
-RUN sed -i "s/#XDEBUG_IDE_KEY#/${XDEBUG_IDE_KEY}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
-    sed -i "s/#XDEBUG_REMOTE_PORT#/${XDEBUG_REMOTE_PORT}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
-    sed -i "s/#XDEBUG_REMOTE_CONNECT_BACK#/${XDEBUG_REMOTE_CONNECT_BACK}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
-    sed -i "s/#PROJECT_NAME#/${PROJECT_NAME}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
-    sed -i "s/#IP_ADDRESS#/${IP_ADDRESS}/g" /usr/local/etc/php/conf.d/00-xdebug.ini && \
+RUN sed -i "s/#XDEBUG_IDE_KEY#/${XDEBUG_IDE_KEY}/g" /etc/php/7.1/fpm/conf.d/99-xdebug.ini && \
+    sed -i "s/#XDEBUG_REMOTE_PORT#/${XDEBUG_REMOTE_PORT}/g" /etc/php/7.1/fpm/conf.d/99-xdebug.ini && \
+    sed -i "s/#XDEBUG_REMOTE_CONNECT_BACK#/${XDEBUG_REMOTE_CONNECT_BACK}/g" /etc/php/7.1/fpm/conf.d/99-xdebug.ini && \
+    sed -i "s/#PROJECT_NAME#/${PROJECT_NAME}/g" /etc/php/7.1/fpm/conf.d/99-xdebug.ini && \
+    sed -i "s/#IP_ADDRESS#/${IP_ADDRESS}/g" /etc/php/7.1/fpm/conf.d/99-xdebug.ini && \
     sed -i "s/#PHP_FPM_PORT#/${PHP_FPM_PORT}/g" /etc/supervisor/conf.d/supervisord.conf && \
     sed -i "s/#USER_EMAIL#/${USER_EMAIL}/g" /root/.gitconfig && \
     sed -i "s/#USER_NAME#/${USER_NAME}/g" /root/.gitconfig
