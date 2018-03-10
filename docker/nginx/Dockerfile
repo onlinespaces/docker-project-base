@@ -1,4 +1,4 @@
-FROM nginx:1.11
+FROM nginx:1.13
 MAINTAINER Scott Collier <scott@onlinespaces.com>
 
 ARG APPLICATION_TYPE
@@ -16,20 +16,16 @@ RUN export TERM=xterm && \
         nano \
         net-tools \
         && \
-
     # Clean
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
-
     # forward request and error logs to docker log collector
     ln -sf /dev/stdout /var/log/nginx/access.log && \
     ln -sf /dev/stderr /var/log/nginx/error.log && \
-
     # Clear old nginx sites
     rm -f /etc/nginx/sites-enabled/* && \
     rm -f /etc/nginx/sites-available/* && \
     rm -f /etc/nginx/conf.d/* && \
-
     # Clean up
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/apk/* && \

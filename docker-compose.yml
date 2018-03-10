@@ -25,7 +25,7 @@ services:
             - "8080:8080"
         volumes:
             - ./${PROJECT_NAME}:/var/www/${PROJECT_NAME}
-            - ./logs/${PROJECT_NAME}:/var/www/${PROJECT_NAME}/var/logs
+            - ./logs/${PROJECT_NAME}:/logs/${PROJECT_NAME}
         tty: true
 
     nginx:
