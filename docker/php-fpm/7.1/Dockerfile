@@ -104,7 +104,7 @@ RUN rm /etc/localtime && \
     ln -s /usr/share/zoneinfo/${TIME_ZONE} /etc/localtime && \
     "date"
 
-# Yarn
+# Node
 RUN curl -sL https://deb.nodesource.com/setup_8.x | bash - &&\
     apt-get install -y nodejs
 
@@ -113,6 +113,7 @@ RUN curl -Ss https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
     echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
     apt-get update && apt-get install -y yarn
 
+# Composer, webpack, bower, gulp
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
         php composer-setup.php && \
         php -r "unlink('composer-setup.php');" && \
